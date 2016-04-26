@@ -17,4 +17,6 @@
 - (CGPoint) pointAtPercent: (CGFloat) percent withSlope: (CGPoint *) slope;
 + (UIBezierPath *) pathWithPoints: (NSArray *) points;
 + (UIBezierPath *) pathWithElements: (NSArray *) elements;
+
+- (NSArray *) pointNearestArray:(CGPoint)point;
 @end

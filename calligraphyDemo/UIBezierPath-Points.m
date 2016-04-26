@@ -88,6 +88,32 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     return pointPercentArray;
 }
 
+- (NSArray *) pointNearestArray:(CGPoint)point
+{
+    NSArray *points = self.points;
+    NSUInteger pointCount = points.count;
+    NSUInteger nearestIndex = 0;
+    CGPoint nearestPoint = POINT(nearestIndex);
+    
+    NSMutableArray *pointPercentArray = [NSMutableArray array];
+    
+    for (int i = 1; i < pointCount; i++)
+    {
+        if (distance(point, POINT(i)) < distance(point, POINT(i-1))) {
+            nearestIndex = i;
+            nearestPoint = POINT(i);
+        }
+    }
+    
+    if (nearestIndex == 0 && pointCount > 3) {
+        [pointPercentArray addObjectsFromArray:@[points[0], points[1], points[2]]];
+    } else {
+        [pointPercentArray addObjectsFromArray:@[points[nearestIndex-1], points[nearestIndex]]];
+    }
+    
+    return pointPercentArray;
+}
+
 - (CGPoint) pointAtPercent: (CGFloat) percent withSlope: (CGPoint *) slope
 {
     NSArray *points = self.points;

@@ -21,6 +21,8 @@
 
 @property (nonatomic, strong)UIBezierPath * touchPath;
 
+@property (nonatomic, strong)UIBezierPath *originalPath;
+
 @end
 
 @implementation DetailViewController
@@ -274,9 +276,18 @@
 //            [hitLayer addSublayer:touchLayer];
 //            [touchLayer display];
             
+            if (!self.originalPath) {
+                self.originalPath = [UIBezierPath bezierPath];
+                self.originalPath.CGPath = hitLayer.path;
+            }
+            
+            NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
             
             self.touchPath = [UIBezierPath bezierPath];
-            [self.touchPath moveToPoint:touchPoint];
+            if ([nearest firstObject]) {
+                [self.touchPath moveToPoint:[(NSValue *)[nearest firstObject] CGPointValue]];
+            }
+            
             hitLayer.path = self.touchPath.CGPath;
             
 //            path.CGPath = hitLayer.path;
@@ -346,30 +357,34 @@
             CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
             NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
             
-            [self.touchPath addLineToPoint:touchPoint];
+            NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
             
-            hitLayer.path = self.touchPath.CGPath;
-            
-            NSArray * curvePoints = [self curveFactorizationWithFromPoint:tempPoint1 toPoint:tempPoint2 controlPoints:[NSArray arrayWithObject: self.points[1]] count:len];
-            
-            // 画每条线段
-            CGPoint lastPoint = tempPoint1;
-            
-            for (int i = 0; i< len ; i++) {
-                
-                // 省略多余点
-                CGFloat delta = sqrt(pow([curvePoints[i] CGPointValue].x - lastPoint.x, 2)+ pow([curvePoints[i] CGPointValue].y - lastPoint.y, 2));
-                
-                if (delta <1) {
-                    continue;
-                }
-                
-                lastPoint = CGPointMake([curvePoints[i] CGPointValue].x, [curvePoints[i]CGPointValue].y);
-                CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
-                
-                [self.touchPath addLineToPoint:touchPoint];                
+            for (int i = 0; i < nearest.count; i++) {
+                [self.touchPath addLineToPoint:[(NSValue *)[nearest objectAtIndex:i] CGPointValue]];
             }
+            
             hitLayer.path = self.touchPath.CGPath;
+            
+//            NSArray * curvePoints = [self curveFactorizationWithFromPoint:tempPoint1 toPoint:tempPoint2 controlPoints:[NSArray arrayWithObject: self.points[1]] count:len];
+//            
+//            // 画每条线段
+//            CGPoint lastPoint = tempPoint1;
+//            
+//            for (int i = 0; i< len ; i++) {
+//                
+//                // 省略多余点
+//                CGFloat delta = sqrt(pow([curvePoints[i] CGPointValue].x - lastPoint.x, 2)+ pow([curvePoints[i] CGPointValue].y - lastPoint.y, 2));
+//                
+//                if (delta <1) {
+//                    continue;
+//                }
+//                
+//                lastPoint = CGPointMake([curvePoints[i] CGPointValue].x, [curvePoints[i]CGPointValue].y);
+//                CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
+//                
+//                [self.touchPath addLineToPoint:touchPoint];                
+//            }
+//            hitLayer.path = self.touchPath.CGPath;
         }
     }
 }
