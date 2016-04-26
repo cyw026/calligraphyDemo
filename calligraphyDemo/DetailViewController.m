@@ -23,6 +23,8 @@
 
 @property (nonatomic, strong)UIBezierPath *originalPath;
 
+@property (nonatomic, strong) UIImage *lastImage;
+
 @end
 
 @implementation DetailViewController
@@ -192,9 +194,45 @@
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx
 {
     //draw a thick red circle
-    CGContextSetLineWidth(ctx, 10.0f);
-    CGContextSetStrokeColorWithColor(ctx, [UIColor redColor].CGColor);
-    CGContextStrokeEllipseInRect(ctx, CGRectMake(0, 0, 320, 640));
+
+    
+    if ([layer isEqual:lastTappedLayer]) {
+        
+//        CAShapeLayer* touchLayer = [CAShapeLayer layer];
+//        touchLayer.path = self.touchPath.CGPath;
+//        touchLayer.fillColor = [UIColor blackColor].CGColor;
+//        touchLayer.strokeColor = [UIColor redColor].CGColor;
+//        touchLayer.lineWidth = 100;
+        
+        
+        
+        CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
+        CGContextSetLineWidth(ctx, 60);
+        
+        CGContextAddPath(ctx, self.touchPath.CGPath);
+        
+        CGContextStrokePath(ctx);
+        
+        CGContextSaveGState(ctx);
+        
+    }
+}
+
+/**
+ *  画图
+ */
+- (void)changeImage {
+    
+    UIGraphicsBeginImageContextWithOptions(self.view.frame.size, NO, 0);
+    
+    [self.lastImage drawInRect:self.view.bounds];
+    
+    UIImage *tempImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    self.lastImage = tempImage;
+    
+    UIGraphicsEndImageContext();
+    
 }
 
 
@@ -212,9 +250,9 @@
 - (CALayer *)hitTest:(CGPoint)point
 {
     
-    NSArray *Identifiers= @[@"path3592",@"path10356"];
+    NSArray *Identifiers= @[@"path3592", @"path4195", @"path4205", @"path4211", @"path10356", @"path4217"];
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         CALayer *hitLayer = [self.contentView.image layerWithIdentifier:Identifiers[i]];
         CGPoint newPoint = [hitLayer convertPoint:point fromLayer:self.view.layer];
         
@@ -250,19 +288,28 @@
         if ([self hitTest:p]) {
             hitLayer = (CAShapeLayer*)[self hitTest:p];
         }
+    
         
-        if( hitLayer == lastTappedLayer )
-            [self deselectTappedLayer];
-        else {
-            [self deselectTappedLayer];
-        }
-        
-        lastTappedLayer = hitLayer;
-        
-        
-        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]) {
-            hitLayer.strokeColor = [UIColor blackColor].CGColor;
-            hitLayer.lineWidth = 100;
+        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] ||
+            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]||
+            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4195"]||
+            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4205"]||
+            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4211"]||
+            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4217"]) {
+            //hitLayer.strokeColor = [UIColor blackColor].CGColor;
+            hitLayer.lineWidth = 0;
+            
+            if( hitLayer == lastTappedLayer )
+                [self deselectTappedLayer];
+            else {
+                [self deselectTappedLayer];
+                
+                self.originalPath = [UIBezierPath bezierPath];
+                self.originalPath.CGPath = hitLayer.path;
+            }
+            
+            lastTappedLayer = hitLayer;
+            lastTappedLayer.delegate = self;
             
             //
             CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
@@ -276,10 +323,10 @@
 //            [hitLayer addSublayer:touchLayer];
 //            [touchLayer display];
             
-            if (!self.originalPath) {
-                self.originalPath = [UIBezierPath bezierPath];
-                self.originalPath.CGPath = hitLayer.path;
-            }
+//            if (!self.originalPath) {
+//                self.originalPath = [UIBezierPath bezierPath];
+//                self.originalPath.CGPath = hitLayer.path;
+//            }
             
             NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
             
@@ -288,7 +335,8 @@
                 [self.touchPath moveToPoint:[(NSValue *)[nearest firstObject] CGPointValue]];
             }
             
-            hitLayer.path = self.touchPath.CGPath;
+            //[lastTappedLayer display];
+            //hitLayer.path = self.touchPath.CGPath;
             
 //            path.CGPath = hitLayer.path;
 //            
@@ -307,15 +355,16 @@
 //            UIBezierPath *newPath = [UIBezierPath pathWithPoints:newPoints];
 //            hitLayer.path = newPath.CGPath;
             
-        } else {
-            if (lastTappedLayer != nil) {
-                lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
-                lastTappedLayerOriginalBorderWidth = lastTappedLayer.borderWidth;
-                
-                lastTappedLayer.borderColor = [UIColor greenColor].CGColor;
-                lastTappedLayer.borderWidth = 3.0;
-            }
         }
+//        else {
+//            if (lastTappedLayer != nil) {
+//                lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
+//                lastTappedLayerOriginalBorderWidth = lastTappedLayer.borderWidth;
+//                
+//                lastTappedLayer.borderColor = [UIColor greenColor].CGColor;
+//                lastTappedLayer.borderWidth = 3.0;
+//            }
+//        }
     }
     
 }
@@ -344,26 +393,31 @@
     
     if ([self.contentView isKindOfClass:[SVGKLayeredImageView class]]) {
         
-        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
         
-        CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
-        
-        if ([self hitTest:p]) {
-            hitLayer = (CAShapeLayer*)[self hitTest:p];
-        }
-        
-        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]) {
+        if ([[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]|| [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4195"]||
+            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4205"]||
+            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4211"]||
+            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4217"]) {
             //
-            CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
-            NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
+            CGPoint touchPoint = [lastTappedLayer convertPoint:p fromLayer:self.view.layer];
+            
             
             NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
             
             for (int i = 0; i < nearest.count; i++) {
-                [self.touchPath addLineToPoint:[(NSValue *)[nearest objectAtIndex:i] CGPointValue]];
+                
+                CGPoint nearestPoint = [(NSValue *)[nearest objectAtIndex:i] CGPointValue];
+                NSLog(@"nearestPoint:%@", NSStringFromCGPoint(nearestPoint));
+                
+                [self.touchPath addLineToPoint:nearestPoint];
             }
             
-            hitLayer.path = self.touchPath.CGPath;
+            lastTappedLayer.delegate = self;
+            [lastTappedLayer setNeedsDisplay];
+            
+            //[self changeImage];
+            
+            //((CAShapeLayer*)lastTappedLayer).path = self.touchPath.CGPath;
             
 //            NSArray * curvePoints = [self curveFactorizationWithFromPoint:tempPoint1 toPoint:tempPoint2 controlPoints:[NSArray arrayWithObject: self.points[1]] count:len];
 //            
@@ -392,7 +446,7 @@
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    
+
 }
 
 - (void)didReceiveMemoryWarning {

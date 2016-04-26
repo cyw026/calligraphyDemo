@@ -93,24 +93,25 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     NSArray *points = self.points;
     NSUInteger pointCount = points.count;
     NSUInteger nearestIndex = 0;
-    CGPoint nearestPoint = POINT(nearestIndex);
+    float nearestDist = distance(point, POINT(0));
     
     NSMutableArray *pointPercentArray = [NSMutableArray array];
     
     for (int i = 1; i < pointCount; i++)
     {
-        if (distance(point, POINT(i)) < distance(point, POINT(i-1))) {
+        float tempDist = distance(point, POINT(i));
+        if (distance(point, POINT(i)) < nearestDist) {
             nearestIndex = i;
-            nearestPoint = POINT(i);
+            nearestDist = tempDist;
         }
     }
-    
-    if (nearestIndex == 0 && pointCount > 3) {
-        [pointPercentArray addObjectsFromArray:@[points[0], points[1], points[2]]];
-    } else {
-        [pointPercentArray addObjectsFromArray:@[points[nearestIndex-1], points[nearestIndex]]];
-    }
-    
+    if (pointCount > 2) {
+        if (nearestIndex == 0) {
+            [pointPercentArray addObjectsFromArray:@[points[0], points[1], points[2]]];
+        } else {
+            [pointPercentArray addObjectsFromArray:@[points[nearestIndex-1], points[nearestIndex]]];
+        }
+    }    
     return pointPercentArray;
 }
 
