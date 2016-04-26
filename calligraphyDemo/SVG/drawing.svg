@@ -247,15 +247,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.81666668"
-     inkscape:cx="390.41565"
+     inkscape:cx="211.64014"
      inkscape:cy="270.81645"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="692"
-     inkscape:window-x="15"
-     inkscape:window-y="100"
+     inkscape:window-x="44"
+     inkscape:window-y="83"
      inkscape:window-maximized="0"
      inkscape:snap-global="false"
      units="px" />
@@ -372,7 +372,7 @@
        style="display:inline;fill:none;fill-opacity:1;stroke:#000000;stroke-opacity:1;enable-background:new"
        sodipodi:insensitive="true" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.00000027, 1.00000009;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000009;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="m 251.0204,185.51018 36.7347,6.12245 36.73469,4.89796 23.87755,2.44898 20.20408,-36.7347 46.53061,37.95919 -51.42854,10.40819 6.12242,17.14283 -6.12245,23.2653 -11.63265,135.91837 -1.83673,98.57143 2.44898,88.16326 -18.9796,-48.97959 -36.12244,-7.34694"
        id="path10356"
        inkscape:connector-curvature="0"
@@ -410,8 +410,8 @@
          sodipodi:nodetypes="ccccccc"
          inkscape:connector-curvature="0"
          id="path3592"
-         d="m 306.17726,32.900335 29.69848,5.656855 12.02082,10.606603 12.02081,13.43503 9.8995,16.970565 7.77817,17.677672 5.65686,24.04163"
-         style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#230000;stroke-width:1.00000009;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.00000027,1.00000009;stroke-dashoffset:0;stroke-opacity:1;enable-background:new" />
+         d="m 287.80991,26.777885 48.06583,11.779305 12.02082,10.606603 12.02081,13.43503 9.8995,16.970565 12.67613,25.024612 32.59564,36.28653"
+         style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#230000;stroke-width:1.00000009;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new" />
     </g>
   </g>
 </svg>

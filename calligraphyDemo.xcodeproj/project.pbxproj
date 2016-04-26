@@ -206,6 +206,7 @@
 		122AABD81CCCA28800677FF1 /* calligraphyDemo */ = {
 			isa = PBXGroup;
 			children = (
+				7277E29B1CCF0808000D5E35 /* categroy */,
 				122AADC81CCD345A00677FF1 /* SVG */,
 				122AABDC1CCCA28800677FF1 /* AppDelegate.h */,
 				122AABDD1CCCA28800677FF1 /* AppDelegate.m */,
@@ -284,6 +285,13 @@
 				122AADDF1CCD3F5E00677FF1 /* SVGKitFramework-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7277E29B1CCF0808000D5E35 /* categroy */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = categroy;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -650,6 +658,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sinodynamic.calligraphyDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -683,6 +692,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sinodynamic.calligraphyDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

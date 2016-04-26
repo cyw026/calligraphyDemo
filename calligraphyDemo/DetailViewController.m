@@ -7,7 +7,7 @@
 //
 
 #import "DetailViewController.h"
-
+#import "UIBezierPath-Points.h"
 
 @interface DetailViewController () 
 {
@@ -15,6 +15,11 @@
     CGFloat lastTappedLayerOriginalBorderWidth;
     CGColorRef lastTappedLayerOriginalBorderColor;
 }
+
+// 点集合
+@property (nonatomic, strong) NSMutableArray *points;
+
+@property (nonatomic, strong)UIBezierPath * touchPath;
 
 @end
 
@@ -56,7 +61,7 @@
 -(void) willLoadNewResource
 {
     // update the view
-    //[self.contentView removeFromSuperview];
+    [self.contentView removeFromSuperview];
 }
 
 - (void)loadSVGFrom:(SVGKSource *) svgSource {
@@ -89,7 +94,7 @@
     
     SVGKImageView* newContentView = nil;
     //document.scale = 0.5;
-    document.size = CGSizeMake(600, 600);
+    document.size = CGSizeMake(375, 300);
     if( document == nil )
     {
         if( parseResult == nil )
@@ -147,13 +152,13 @@
         /** set the border for new item */
         self.contentView.showBorder = FALSE;
         
-        self.contentView.frame = CGRectMake(0, 100, 600, 600);
+        self.contentView.frame = CGRectMake(0, 64, 600, 600);
         
         self.contentView.layer.backgroundColor = [UIColor blueColor].CGColor;
         
         [self.view addSubview:self.contentView];
         
-        //[self.contentView setNeedsDisplay];
+        [self.contentView setNeedsLayout];
         
         //create sublayer
         CALayer *blueLayer = [CALayer layer];
@@ -202,6 +207,21 @@
     }
 }
 
+- (CALayer *)hitTest:(CGPoint)point
+{
+    
+    CALayer *hitLayer = [self.contentView.image layerWithIdentifier:@"path3592"];
+
+    point = [hitLayer convertPoint:point fromLayer:self.view.layer];
+    
+    BOOL boundsContains = CGRectContainsPoint(hitLayer.bounds, point);
+    
+    if (boundsContains) {
+        return hitLayer;
+    }
+    return nil;
+}
+
 #pragma mark - /*** 触摸事件 ***/
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -211,18 +231,23 @@
     
     NSValue *vp = [NSValue valueWithCGPoint:p];
     
-    //self.points = [NSMutableArray arrayWithObjects:vp,vp,vp, nil];
+    self.points = [NSMutableArray arrayWithObjects:vp,vp,vp, nil];
     
-    //[self changeImage];
     
     if ([self.contentView isKindOfClass:[SVGKLayeredImageView class]]) {
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
         SVGKImage *image = layerForHitTesting.SVGImage;
         
         NSLog(@"hitLayer.DOMTree:%@", image.DOMTree);
-        SVGKLayer* hitLayer = (SVGKLayer*)[layerForHitTesting hitTest:p];
+        CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
         //SVGKImage *hitLayerImage = hitLayer.SVGImage;
         //NSLog(@"hitLayerImage:%@", hitLayerImage.DOMTree);
+        
+        if ([self hitTest:p]) {
+            hitLayer = (CAShapeLayer*)[self hitTest:p];
+
+            
+        }
         
         if( hitLayer == lastTappedLayer )
             [self deselectTappedLayer];
@@ -232,15 +257,54 @@
         
         lastTappedLayer = hitLayer;
         
-        if (lastTappedLayer != nil) {
-            lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
-            lastTappedLayerOriginalBorderWidth = lastTappedLayer.borderWidth;
-            
-            lastTappedLayer.borderColor = [UIColor greenColor].CGColor;
-            lastTappedLayer.borderWidth = 3.0;
-        }
         
-        //hitLayer.backgroundColor = [UIColor redColor].CGColor;
+        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]) {
+            hitLayer.strokeColor = [UIColor blackColor].CGColor;
+            hitLayer.lineWidth = 500;
+            
+            //
+            CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
+            NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
+            
+//            UIBezierPath *touchPath = [UIBezierPath bezierPathWithArcCenter:touchPoint radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+//            CAShapeLayer* touchLayer = [CAShapeLayer layer];
+//            touchLayer.path = touchPath.CGPath;
+//            touchLayer.fillColor = [UIColor blackColor].CGColor;
+//            touchLayer.strokeColor = [UIColor redColor].CGColor;
+//            [hitLayer addSublayer:touchLayer];
+//            [touchLayer display];
+            
+            
+            self.touchPath = [UIBezierPath bezierPath];
+            [self.touchPath moveToPoint:touchPoint];
+            hitLayer.path = self.touchPath.CGPath;
+            
+//            path.CGPath = hitLayer.path;
+//            
+//            NSArray *points = [path points];
+//            
+//            NSMutableArray *newPoints = [NSMutableArray array];
+//            
+//            for (int i = 0; i < points.count; i++) {
+//                CGPoint point = [(NSValue *)[points objectAtIndex:i] CGPointValue];
+//                NSLog(@"point:%@", NSStringFromCGPoint(point));
+//                if (i == 5 || i == 6) {
+//                    [newPoints addObject:[NSValue valueWithCGPoint:point]];
+//                }
+//            }
+//            
+//            UIBezierPath *newPath = [UIBezierPath pathWithPoints:newPoints];
+//            hitLayer.path = newPath.CGPath;
+            
+        } else {
+            if (lastTappedLayer != nil) {
+                lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
+                lastTappedLayerOriginalBorderWidth = lastTappedLayer.borderWidth;
+                
+                lastTappedLayer.borderColor = [UIColor greenColor].CGColor;
+                lastTappedLayer.borderWidth = 3.0;
+            }
+        }
     }
     
 }
@@ -248,12 +312,66 @@
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     
     UITouch *touch = touches.anyObject;
-    CGPoint p = [touch locationInView:self.contentView];
+    CGPoint p = [touch locationInView:self.view];
     
     NSValue *vp = [NSValue valueWithCGPoint:p];
     
-    //self.points = [NSMutableArray arrayWithObjects:_points[1],_points[2],vp, nil];
+    self.points = [NSMutableArray arrayWithObjects:_points[1],_points[2],vp, nil];
     
+    // 设置贝塞尔曲线的起始点和末尾点
+    CGPoint p0 = [self.points[0] CGPointValue];
+    CGPoint p1 = [self.points[1] CGPointValue];
+    CGPoint p2 = [self.points[2] CGPointValue];
+    
+    CGPoint tempPoint1 = CGPointMake((p0.x + p1.x) * 0.5, (p0.y + p1.y) * 0.5);
+    CGPoint tempPoint2 = CGPointMake((p1.x + p2.x) * 0.5, (p1.y + p2.y) * 0.5);
+    
+    // 估算贝塞尔曲线长度
+    int x1 = fabs(tempPoint1.x - tempPoint2.x);
+    int x2 = fabs(tempPoint1.y - tempPoint2.y);
+    int len = (int)(sqrt(pow(x1, 2) + pow(x2, 2))*10);
+    
+    if ([self.contentView isKindOfClass:[SVGKLayeredImageView class]]) {
+        
+        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
+        
+        CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
+        
+        if ([self hitTest:p]) {
+            hitLayer = (CAShapeLayer*)[self hitTest:p];
+        }
+        
+        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]) {
+            //
+            CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
+            NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
+            
+            [self.touchPath addLineToPoint:touchPoint];
+            
+            hitLayer.path = self.touchPath.CGPath;
+            
+            NSArray * curvePoints = [self curveFactorizationWithFromPoint:tempPoint1 toPoint:tempPoint2 controlPoints:[NSArray arrayWithObject: self.points[1]] count:len];
+            
+            // 画每条线段
+            CGPoint lastPoint = tempPoint1;
+            
+            for (int i = 0; i< len ; i++) {
+                
+                // 省略多余点
+                CGFloat delta = sqrt(pow([curvePoints[i] CGPointValue].x - lastPoint.x, 2)+ pow([curvePoints[i] CGPointValue].y - lastPoint.y, 2));
+                
+                if (delta <1) {
+                    continue;
+                }
+                
+                lastPoint = CGPointMake([curvePoints[i] CGPointValue].x, [curvePoints[i]CGPointValue].y);
+                CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
+                
+                [self.touchPath addLineToPoint:touchPoint];                
+            }
+            hitLayer.path = self.touchPath.CGPath;
+        }
+    }
 }
 
 
@@ -265,6 +383,97 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+/**
+ *  分解贝塞尔曲线
+ */
+- (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count {
+    
+    // 如果分解数量为0，生成默认分解数量
+    if (count == 0) {
+        int x1 = fabs(fPoint.x - tPoint.x);
+        int x2 = fabs(fPoint.y - tPoint.y);
+        count = (int)sqrt(pow(x1, 2) + pow(x2, 2));
+    }
+    
+    // 计算贝塞尔曲线
+    CGFloat s = 0.0;
+    NSMutableArray *t = [NSMutableArray array];
+    CGFloat pc = 1/(CGFloat)count;
+    
+    int power = (int)(points.count + 1);
+    
+    
+    for (int i =0; i<= count + 1; i++) {
+        
+        [t addObject:[NSNumber numberWithFloat:s]];
+        s = s + pc;
+        
+    }
+    
+    NSMutableArray *newPoints = [NSMutableArray array];
+    
+    for (int i =0; i<=count +1; i++) {
+        
+        CGFloat resultX = fPoint.x * [self bezMakerWithN:power K:0 T:[t[i] floatValue]] + tPoint.x * [self bezMakerWithN:power K:power T:[t[i] floatValue]];
+        
+        for (int j = 1; j<= power -1; j++) {
+            
+            resultX += [points[j-1] CGPointValue].x * [self bezMakerWithN:power K:j T:[t[i] floatValue]];
+            
+        }
+        
+        CGFloat resultY = fPoint.y * [self bezMakerWithN:power K:0 T:[t[i] floatValue]] + tPoint.y * [self bezMakerWithN:power K:power T:[t[i] floatValue]];
+        
+        for (int j = 1; j<= power -1; j++) {
+            
+            resultY += [points[j-1] CGPointValue].y * [self bezMakerWithN:power K:j T:[t[i] floatValue]];
+            
+        }
+        
+        [newPoints addObject:[NSValue valueWithCGPoint:CGPointMake(resultX, resultY)]];
+    }
+    return newPoints;
+    
+}
+
+
+
+- (CGFloat)compWithN:(int)n andK:(int)k {
+    int s1 = 1;
+    int s2 = 1;
+    
+    if (k == 0) {
+        return 1.0;
+    }
+    
+    for (int i = n; i>=n-k+1; i--) {
+        s1 = s1*i;
+    }
+    for (int i = k;i>=2;i--) {
+        s2 = s2 *i;
+    }
+    
+    CGFloat res = (CGFloat)s1/s2;
+    return  res;
+}
+
+- (CGFloat)realPowWithN:(CGFloat)n K:(int)k {
+    
+    if (k == 0) {
+        return 1.0;
+    }
+    
+    return pow(n, (CGFloat)k);
+}
+
+- (CGFloat)bezMakerWithN:(int)n K:(int)k T:(CGFloat)t {
+    
+    return [self compWithN:n andK:k] * [self realPowWithN:1-t K:n-k] * [self realPowWithN:t K:k];
+    
+    
 }
 
 @end
