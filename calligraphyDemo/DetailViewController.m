@@ -247,8 +247,6 @@
         
         if ([self hitTest:p]) {
             hitLayer = (CAShapeLayer*)[self hitTest:p];
-
-            
         }
         
         if( hitLayer == lastTappedLayer )
@@ -262,7 +260,7 @@
         
         if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]) {
             hitLayer.strokeColor = [UIColor blackColor].CGColor;
-            hitLayer.lineWidth = 500;
+            hitLayer.lineWidth = 100;
             
             //
             CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
