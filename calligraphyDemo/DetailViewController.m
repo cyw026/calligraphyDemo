@@ -210,14 +210,16 @@
 - (CALayer *)hitTest:(CGPoint)point
 {
     
-    CALayer *hitLayer = [self.contentView.image layerWithIdentifier:@"path3592"];
+    NSArray *Identifiers= @[@"path3592",@"path10356"];
 
-    point = [hitLayer convertPoint:point fromLayer:self.view.layer];
-    
-    BOOL boundsContains = CGRectContainsPoint(hitLayer.bounds, point);
-    
-    if (boundsContains) {
-        return hitLayer;
+    for (int i = 0; i < 2; i++) {
+        CALayer *hitLayer = [self.contentView.image layerWithIdentifier:Identifiers[i]];
+        CGPoint newPoint = [hitLayer convertPoint:point fromLayer:self.view.layer];
+        
+        BOOL boundsContains = CGRectContainsPoint(hitLayer.bounds, newPoint);
+        if (boundsContains) {
+            return hitLayer;
+        }
     }
     return nil;
 }
