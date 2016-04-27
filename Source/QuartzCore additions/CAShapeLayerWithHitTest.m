@@ -12,8 +12,6 @@
 {
 	BOOL boundsContains = CGRectContainsPoint(self.bounds, p); // must be BOUNDS because Apple pre-converts the point to local co-ords before running the test
 	
-    BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
-    
     if (self.mask) {
         // 有遮罩层
         CALayerWithChildHitTest *mask = (CALayerWithChildHitTest *)self.mask;
@@ -28,7 +26,7 @@
     }
 	if( boundsContains )
 	{
-		
+        BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
 		
 		if( pathContains )
 		{

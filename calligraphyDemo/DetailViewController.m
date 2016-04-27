@@ -72,12 +72,12 @@
     
     [self willLoadNewResource];
     
+    
+    //FIXME: 这里使用异步方式解析XML报错，暂时没找到原因先采用同步加载方式
     SVGKImage *document = [SVGKImage imageNamed:@"drawing.svg"];
-    
-    
     [self internalLoadedResource:svgSource parserOutput:nil createImageViewFromDocument:document];
 
-    
+    // 异步解析
 //    [SVGKImage imageWithSource:svgSource
 //                                       onCompletion:^(SVGKImage *loadedImage, SVGKParseResult* parseResult)
 //                          {
@@ -116,7 +116,6 @@
         if( document.parseErrorsAndWarnings.rootOfSVGTree != nil )
         {
             //NSLog(@"[%@] Freshly loaded document (name = %@) has size = %@", [self class], name, NSStringFromCGSize(document.size) );
-            
             newContentView = [[SVGKLayeredImageView alloc] initWithSVGKImage:document];
             
             //newContentView = [[SVGKFastImageView alloc] initWithSVGKImage:document];
@@ -128,10 +127,8 @@
         {
             [[[UIAlertView alloc] initWithTitle:@"SVG parse failed" message:[NSString stringWithFormat:@"%@",parseResult] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
             newContentView = nil; // signals to the rest of this method: the load failed
-            
         }
     }
-    
     
     [self didLoadNewResourceCreatingImageView:newContentView];
 }
@@ -147,8 +144,6 @@
         /**
          * NB: at this point we're guaranteed to have a "new" replacemtent ready for self.contentView
          */
-        
-        //[self.contentView removeFromSuperview];
         
         /******* swap the new contentview in ************/
         self.contentView = newContentView;
@@ -191,20 +186,15 @@
     }
 }
 
+/**
+ *  在当前图形绘制触摸产生的笔划
+ *
+ *  @param layer 当前选中绘制的笔划图形所在图层
+ *  @param ctx   当前图层的图形上下文
+ */
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx
 {
-    //draw a thick red circle
-
-    
     if ([layer isEqual:lastTappedLayer]) {
-        
-//        CAShapeLayer* touchLayer = [CAShapeLayer layer];
-//        touchLayer.path = self.touchPath.CGPath;
-//        touchLayer.fillColor = [UIColor blackColor].CGColor;
-//        touchLayer.strokeColor = [UIColor redColor].CGColor;
-//        touchLayer.lineWidth = 100;
-        
-        
         
         CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
         CGContextSetLineWidth(ctx, 60);
@@ -214,7 +204,6 @@
         CGContextStrokePath(ctx);
         
         CGContextSaveGState(ctx);
-        
     }
 }
 
@@ -258,7 +247,9 @@
     UIGraphicsEndImageContext();
 }
 
-
+/**
+ *  取消当前图层的选中状态
+ */
 -(void) deselectTappedLayer
 {
     if( lastTappedLayer != nil )
@@ -268,23 +259,6 @@
         
         lastTappedLayer = nil;
     }
-}
-
-- (CALayer *)hitTest:(CGPoint)point
-{
-    
-    NSArray *Identifiers= @[@"path3592", @"path4195", @"path4205", @"path4211", @"path10356", @"path4217"];
-
-    for (int i = 0; i < 3; i++) {
-        CALayer *hitLayer = [self.contentView.image layerWithIdentifier:Identifiers[i]];
-        CGPoint newPoint = [hitLayer convertPoint:point fromLayer:self.view.layer];
-        
-        BOOL boundsContains = CGRectContainsPoint(hitLayer.bounds, newPoint);
-        if (boundsContains) {
-            return hitLayer;
-        }
-    }
-    return nil;
 }
 
 #pragma mark - /*** 触摸事件 ***/
