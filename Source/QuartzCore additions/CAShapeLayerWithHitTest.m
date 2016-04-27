@@ -1,4 +1,5 @@
 #import "CAShapeLayerWithHitTest.h"
+#import "CALayerWithChildHitTest.h"
 
 /*! Used by the main ShapeElement (and all subclasses) to do perfect "containsPoint" calculations via Apple's API calls
  
@@ -11,9 +12,23 @@
 {
 	BOOL boundsContains = CGRectContainsPoint(self.bounds, p); // must be BOUNDS because Apple pre-converts the point to local co-ords before running the test
 	
+    BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
+    
+    if (self.mask) {
+        // 有遮罩层
+        CALayerWithChildHitTest *mask = (CALayerWithChildHitTest *)self.mask;
+        CAShapeLayerWithHitTest *clipPathLayer = (CAShapeLayerWithHitTest *)[[mask sublayers] firstObject];
+        
+        BOOL clipPathContains = CGPathContainsPoint(clipPathLayer.path, NULL, p, false);
+        
+        if ( clipPathContains )
+        {
+            return TRUE;
+        }
+    }
 	if( boundsContains )
 	{
-		BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
+		
 		
 		if( pathContains )
 		{

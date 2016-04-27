@@ -25,7 +25,13 @@ http://www.w3.org/TR/SVG/masking.html#InterfaceSVGClipPathElement
 
 @property(nonatomic, readonly) SVG_UNIT_TYPE clipPathUnits;
 
+/** The actual path as parsed from the original file. THIS MIGHT NOT BE NORMALISED (TODO: perhaps an extra feature?) */
+@property (nonatomic, readonly) CGPathRef pathForShapeInRelativeCoords;
+
+@property (nonatomic, readonly) CGPathRef finalClipPath;
+
 - (CALayer *) newLayer;
 - (void)layoutLayer:(CALayer *)layer toMaskLayer:(CALayer *)maskThis;
+
 
 @end

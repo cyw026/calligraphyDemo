@@ -227,12 +227,35 @@
     
     [self.lastImage drawInRect:self.view.bounds];
     
+    // 设置贝塞尔曲线的起始点和末尾点
+    CGPoint p0 = [self.points[0] CGPointValue];
+    CGPoint p1 = [self.points[1] CGPointValue];
+    CGPoint p2 = [self.points[2] CGPointValue];
+    
+    CGPoint tempPoint1 = CGPointMake((p0.x + p1.x) * 0.5, (p0.y + p1.y) * 0.5);
+    CGPoint tempPoint2 = CGPointMake((p1.x + p2.x) * 0.5, (p1.y + p2.y) * 0.5);
+    
+    
+        UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:p2 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+        [[UIColor redColor] set];
+        [pointPath stroke];
+        
+        pointPath = [UIBezierPath bezierPathWithArcCenter:p1 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+        [pointPath stroke];
+        
+        pointPath = [UIBezierPath bezierPathWithArcCenter:p0 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+        [pointPath stroke];
+        
+        pointPath = [UIBezierPath bezierPathWithArcCenter:tempPoint1 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+        [pointPath stroke];
+        
+        pointPath = [UIBezierPath bezierPathWithArcCenter:tempPoint2 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+        [pointPath stroke];
+    
+    // 绘图
     UIImage *tempImage = UIGraphicsGetImageFromCurrentImageContext();
-    
     self.lastImage = tempImage;
-    
     UIGraphicsEndImageContext();
-    
 }
 
 
@@ -284,18 +307,10 @@
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
         //SVGKImage *hitLayerImage = hitLayer.SVGImage;
         //NSLog(@"hitLayerImage:%@", hitLayerImage.DOMTree);
-        
-        if ([self hitTest:p]) {
-            hitLayer = (CAShapeLayer*)[self hitTest:p];
-        }
     
         
-        if ([[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] ||
-            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]||
-            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4195"]||
-            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4205"]||
-            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4211"]||
-            [[hitLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4217"]) {
+        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]] && hitLayer.mask) {
+            // 判断当前选中的是否为笔画的形状图层
             //hitLayer.strokeColor = [UIColor blackColor].CGColor;
             hitLayer.lineWidth = 0;
             
@@ -393,12 +408,12 @@
     
     if ([self.contentView isKindOfClass:[SVGKLayeredImageView class]]) {
         
+//        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
+//        
+//        CALayer* hitLayer = [layerForHitTesting hitTest:p];
         
-        if ([[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path3592"] || [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path10356"]|| [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4195"]||
-            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4205"]||
-            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4211"]||
-            [[lastTappedLayer valueForKey:kSVGElementIdentifier] isEqualToString:@"path4217"]) {
-            //
+        if (lastTappedLayer) {
+            // 暂时不判断是否超出了笔划形状的区域
             CGPoint touchPoint = [lastTappedLayer convertPoint:p fromLayer:self.view.layer];
             
             
@@ -446,7 +461,7 @@
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-
+    lastTappedLayer = nil;
 }
 
 - (void)didReceiveMemoryWarning {
