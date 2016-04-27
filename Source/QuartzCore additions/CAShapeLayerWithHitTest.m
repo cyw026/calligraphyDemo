@@ -10,14 +10,16 @@
 
 - (BOOL) containsPoint:(CGPoint)p
 {
-	BOOL boundsContains = CGRectContainsPoint(self.bounds, p); // must be BOUNDS because Apple pre-converts the point to local co-ords before running the test
+	BOOL boundsContains = CGRectContainsPoint(CGRectInset(self.bounds, -20, -20), p); // must be BOUNDS because Apple pre-converts the point to local co-ords before running the test
 	
     if (self.mask) {
         // 有遮罩层
         CALayerWithChildHitTest *mask = (CALayerWithChildHitTest *)self.mask;
         CAShapeLayerWithHitTest *clipPathLayer = (CAShapeLayerWithHitTest *)[[mask sublayers] firstObject];
         
-        BOOL clipPathContains = CGPathContainsPoint(clipPathLayer.path, NULL, p, false);
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(clipPathLayer.path, nil, 30, kCGLineCapRound, kCGLineJoinRound, 30);
+        
+        BOOL clipPathContains = CGPathContainsPoint(strokingPath, NULL, p, false);
         
         if ( clipPathContains )
         {
@@ -26,7 +28,9 @@
     }
 	if( boundsContains )
 	{
-        BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(self.path, nil, 30, kCGLineCapRound, kCGLineJoinRound, 30);
+
+        BOOL pathContains = CGPathContainsPoint(strokingPath, NULL, p, false);
 		
 		if( pathContains )
 		{
