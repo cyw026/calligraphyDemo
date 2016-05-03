@@ -18,5 +18,5 @@
 + (UIBezierPath *) pathWithPoints: (NSArray *) points;
 + (UIBezierPath *) pathWithElements: (NSArray *) elements;
 
-- (NSArray *) pointNearestArray:(CGPoint)point;
++ (NSArray *) pointsAdjacent: (CGPathRef ) points withPoint:(CGPoint)point;
 @end

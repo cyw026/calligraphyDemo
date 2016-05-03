@@ -11,17 +11,13 @@
 
 @interface DetailViewController () 
 {
-    CALayer* lastTappedLayer;
+    CAShapeLayer* lastTappedLayer;
     CGFloat lastTappedLayerOriginalBorderWidth;
     CGColorRef lastTappedLayerOriginalBorderColor;
 }
 
 // 点集合
 @property (nonatomic, strong) NSMutableArray *points;
-
-@property (nonatomic, strong)UIBezierPath * touchPath;
-
-@property (nonatomic, strong)UIBezierPath *originalPath;
 
 @property (nonatomic, strong) UIImage *lastImage;
 
@@ -151,7 +147,7 @@
         /** set the border for new item */
         self.contentView.showBorder = FALSE;
         
-        self.contentView.frame = CGRectMake(0, 64, 600, 600);
+        self.contentView.frame = CGRectMake(0, 64, 600, 300);
         
         self.contentView.layer.backgroundColor = [UIColor blueColor].CGColor;
         
@@ -196,55 +192,26 @@
 {
     if ([layer isEqual:lastTappedLayer]) {
         
+//        UIGraphicsPushContext(ctx);
+//        [self.lastImage drawInRect:layer.frame];
+//        UIGraphicsPopContext();
+        
+        CGContextSaveGState(ctx);
         CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
         CGContextSetLineWidth(ctx, 60);
         
-        CGContextAddPath(ctx, self.touchPath.CGPath);
+        UIBezierPath *drawingPath = [layer valueForKey:kDrawingPathKey];
+        CGContextAddPath(ctx, drawingPath.CGPath);
         
         CGContextStrokePath(ctx);
         
         CGContextSaveGState(ctx);
+        
+//        CGImageRef imageRef = CGBitmapContextCreateImage(ctx);
+//        self.lastImage = [UIImage imageWithCGImage:imageRef];
+//        CFRelease(imageRef);
+        
     }
-}
-
-/**
- *  画图
- */
-- (void)changeImage {
-    
-    UIGraphicsBeginImageContextWithOptions(self.view.frame.size, NO, 0);
-    
-    [self.lastImage drawInRect:self.view.bounds];
-    
-    // 设置贝塞尔曲线的起始点和末尾点
-    CGPoint p0 = [self.points[0] CGPointValue];
-    CGPoint p1 = [self.points[1] CGPointValue];
-    CGPoint p2 = [self.points[2] CGPointValue];
-    
-    CGPoint tempPoint1 = CGPointMake((p0.x + p1.x) * 0.5, (p0.y + p1.y) * 0.5);
-    CGPoint tempPoint2 = CGPointMake((p1.x + p2.x) * 0.5, (p1.y + p2.y) * 0.5);
-    
-    
-        UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:p2 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-        [[UIColor redColor] set];
-        [pointPath stroke];
-        
-        pointPath = [UIBezierPath bezierPathWithArcCenter:p1 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-        [pointPath stroke];
-        
-        pointPath = [UIBezierPath bezierPathWithArcCenter:p0 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-        [pointPath stroke];
-        
-        pointPath = [UIBezierPath bezierPathWithArcCenter:tempPoint1 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-        [pointPath stroke];
-        
-        pointPath = [UIBezierPath bezierPathWithArcCenter:tempPoint2 radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-        [pointPath stroke];
-    
-    // 绘图
-    UIImage *tempImage = UIGraphicsGetImageFromCurrentImageContext();
-    self.lastImage = tempImage;
-    UIGraphicsEndImageContext();
 }
 
 /**
@@ -271,7 +238,7 @@
     NSValue *vp = [NSValue valueWithCGPoint:p];
     
     self.points = [NSMutableArray arrayWithObjects:vp,vp,vp, nil];
-    
+    //[self changeImage];
     
     if ([self.contentView isKindOfClass:[SVGKLayeredImageView class]]) {
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
@@ -281,6 +248,37 @@
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
         //SVGKImage *hitLayerImage = hitLayer.SVGImage;
         //NSLog(@"hitLayerImage:%@", hitLayerImage.DOMTree);
+        
+#if 0
+        CALayerWithChildHitTest *mask = (CALayerWithChildHitTest *)hitLayer.mask;
+        CAShapeLayerWithHitTest *clipPathLayer = (CAShapeLayerWithHitTest *)[[mask sublayers] firstObject];
+        UIBezierPath *clipPath = [UIBezierPath bezierPath];
+        clipPath.CGPath = clipPathLayer.path;
+        
+        for (int i = (int)clipPath.points.count - 1; i > 0; i--) {
+
+            NSValue *pointV = clipPath.points[i];
+            CGPoint Point = [self.view.layer convertPoint:[pointV CGPointValue] fromLayer:hitLayer];
+
+            UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:Point radius:8 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+            CAShapeLayer* clipLayer = [CAShapeLayer layer];
+            clipLayer.path = pointPath.CGPath;
+            clipLayer.fillColor = [UIColor blackColor].CGColor;
+            clipLayer.strokeColor = [UIColor redColor].CGColor;
+            [self.view.layer addSublayer:clipLayer];
+            
+            CATextLayer *textLayer = [CATextLayer layer];
+            textLayer.string = [NSString stringWithFormat:@"%d", i];
+            textLayer.font = (__bridge CFTypeRef _Nullable)(@"HiraKakuProN-W3");
+            textLayer.fontSize = 10.f;
+            textLayer.alignmentMode = kCAAlignmentCenter;//字体的对齐方式
+            textLayer.position = Point;
+            textLayer.foregroundColor = [UIColor greenColor].CGColor;//字体的颜色
+            textLayer.bounds = CGRectMake(0, 0, 10, 10);
+            [clipLayer addSublayer:textLayer];
+        }
+#endif
+        
     
         
         if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]] && hitLayer.mask) {
@@ -292,9 +290,6 @@
                 [self deselectTappedLayer];
             else {
                 [self deselectTappedLayer];
-                
-                self.originalPath = [UIBezierPath bezierPath];
-                self.originalPath.CGPath = hitLayer.path;
             }
             
             lastTappedLayer = hitLayer;
@@ -303,47 +298,16 @@
             //
             CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
             NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
+            NSArray *nearest = [UIBezierPath pointsAdjacent:hitLayer.path withPoint:touchPoint];
             
-//            UIBezierPath *touchPath = [UIBezierPath bezierPathWithArcCenter:touchPoint radius:3 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-//            CAShapeLayer* touchLayer = [CAShapeLayer layer];
-//            touchLayer.path = touchPath.CGPath;
-//            touchLayer.fillColor = [UIColor blackColor].CGColor;
-//            touchLayer.strokeColor = [UIColor redColor].CGColor;
-//            [hitLayer addSublayer:touchLayer];
-//            [touchLayer display];
-            
-//            if (!self.originalPath) {
-//                self.originalPath = [UIBezierPath bezierPath];
-//                self.originalPath.CGPath = hitLayer.path;
-//            }
-            
-            NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
-            
-            self.touchPath = [UIBezierPath bezierPath];
-            if ([nearest firstObject]) {
-                [self.touchPath moveToPoint:[(NSValue *)[nearest firstObject] CGPointValue]];
+            UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
+            if (drawingPath == nil) {
+                drawingPath = [UIBezierPath bezierPath];
+                [hitLayer setValue:drawingPath forKey:kDrawingPathKey];
             }
-            
-            //[lastTappedLayer display];
-            //hitLayer.path = self.touchPath.CGPath;
-            
-//            path.CGPath = hitLayer.path;
-//            
-//            NSArray *points = [path points];
-//            
-//            NSMutableArray *newPoints = [NSMutableArray array];
-//            
-//            for (int i = 0; i < points.count; i++) {
-//                CGPoint point = [(NSValue *)[points objectAtIndex:i] CGPointValue];
-//                NSLog(@"point:%@", NSStringFromCGPoint(point));
-//                if (i == 5 || i == 6) {
-//                    [newPoints addObject:[NSValue valueWithCGPoint:point]];
-//                }
-//            }
-//            
-//            UIBezierPath *newPath = [UIBezierPath pathWithPoints:newPoints];
-//            hitLayer.path = newPath.CGPath;
-            
+            if ([nearest firstObject]) {
+                [drawingPath moveToPoint:[(NSValue *)[nearest firstObject] CGPointValue]];
+            }
         }
 //        else {
 //            if (lastTappedLayer != nil) {
@@ -391,14 +355,14 @@
             CGPoint touchPoint = [lastTappedLayer convertPoint:p fromLayer:self.view.layer];
             
             
-            NSArray *nearest = [self.originalPath pointNearestArray:touchPoint];
+            NSArray *nearest = [UIBezierPath pointsAdjacent:lastTappedLayer.path withPoint:touchPoint];
+            
+            UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
             
             for (int i = 0; i < nearest.count; i++) {
-                
                 CGPoint nearestPoint = [(NSValue *)[nearest objectAtIndex:i] CGPointValue];
                 NSLog(@"nearestPoint:%@", NSStringFromCGPoint(nearestPoint));
-                
-                [self.touchPath addLineToPoint:nearestPoint];
+                [drawingPath addLineToPoint:nearestPoint];
             }
             
             lastTappedLayer.delegate = self;

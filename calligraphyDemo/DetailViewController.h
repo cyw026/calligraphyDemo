@@ -11,12 +11,13 @@
 #import "SVGKImage.h"
 #import <QuartzCore/CALayer.h>
 
+#define kDrawingPathKey @"drawingPath"
+
 @interface DetailViewController : UIViewController
 
 @property (strong, nonatomic) id detailItem;
 
 @property (nonatomic, strong) SVGKImageView *contentView;
-
 
 - (void)loadSVGFrom:(SVGKSource *) svgSource;
 

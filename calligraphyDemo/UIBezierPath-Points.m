@@ -88,9 +88,11 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     return pointPercentArray;
 }
 
-- (NSArray *) pointNearestArray:(CGPoint)point
++ (NSArray *) pointsAdjacent: (CGPathRef) path withPoint:(CGPoint)point
 {
-    NSArray *points = self.points;
+    NSMutableArray *points = [NSMutableArray array];
+    CGPathApply(path, (__bridge void *)points, getPointsFromBezier);
+    
     NSUInteger pointCount = points.count;
     NSUInteger nearestIndex = 0;
     float nearestDist = distance(point, POINT(0));
