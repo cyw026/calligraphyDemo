@@ -28,6 +28,32 @@
 		122AADE71CCD475000677FF1 /* Coins.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE51CCD475000677FF1 /* Coins.svg */; };
 		122AADE81CCD475000677FF1 /* CSS.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE61CCD475000677FF1 /* CSS.svg */; };
 		7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */ = {isa = PBXBuildFile; fileRef = 7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */; };
+		7297A5861CD99D13003682A1 /* Erase.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5671CD99D13003682A1 /* Erase.caf */; };
+		7297A5871CD99D13003682A1 /* Blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5691CD99D13003682A1 /* Blue.png */; };
+		7297A5881CD99D13003682A1 /* Green.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56A1CD99D13003682A1 /* Green.png */; };
+		7297A5891CD99D13003682A1 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56B1CD99D13003682A1 /* Icon-72.png */; };
+		7297A58A1CD99D13003682A1 /* Icon-Small-50.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56C1CD99D13003682A1 /* Icon-Small-50.png */; };
+		7297A58B1CD99D13003682A1 /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56D1CD99D13003682A1 /* Icon-Small.png */; };
+		7297A58C1CD99D13003682A1 /* Icon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56E1CD99D13003682A1 /* Icon-Small@2x.png */; };
+		7297A58D1CD99D13003682A1 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A56F1CD99D13003682A1 /* Icon.png */; };
+		7297A58E1CD99D13003682A1 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5701CD99D13003682A1 /* Icon@2x.png */; };
+		7297A58F1CD99D13003682A1 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5711CD99D13003682A1 /* iTunesArtwork */; };
+		7297A5901CD99D13003682A1 /* Purple.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5721CD99D13003682A1 /* Purple.png */; };
+		7297A5911CD99D13003682A1 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5731CD99D13003682A1 /* Red.png */; };
+		7297A5921CD99D13003682A1 /* Yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5741CD99D13003682A1 /* Yellow.png */; };
+		7297A5931CD99D13003682A1 /* PaintingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5761CD99D13003682A1 /* PaintingView.m */; };
+		7297A5941CD99D13003682A1 /* PaintingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5781CD99D13003682A1 /* PaintingViewController.m */; };
+		7297A5951CD99D13003682A1 /* Recording.data in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5791CD99D13003682A1 /* Recording.data */; };
+		7297A5961CD99D13003682A1 /* Select.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7297A57A1CD99D13003682A1 /* Select.caf */; };
+		7297A5971CD99D13003682A1 /* point.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 7297A57C1CD99D13003682A1 /* point.fsh */; };
+		7297A5981CD99D13003682A1 /* point.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 7297A57D1CD99D13003682A1 /* point.vsh */; };
+		7297A5991CD99D13003682A1 /* SoundEffect.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A57F1CD99D13003682A1 /* SoundEffect.m */; };
+		7297A59A1CD99D13003682A1 /* fileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5831CD99D13003682A1 /* fileUtil.m */; };
+		7297A59B1CD99D13003682A1 /* shaderUtil.c in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5841CD99D13003682A1 /* shaderUtil.c */; };
+		7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A11CD9A054003682A1 /* PaintingViewController.xib */; };
+		7297A5A41CD9A118003682A1 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A31CD9A118003682A1 /* brush.png */; };
+		7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5A61CD9CD8F003682A1 /* CBrush.m */; };
+		7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A91CD9D48A003682A1 /* brush1.png */; };
 		72BA1A441CCE0629006849E3 /* drawing.svg in Resources */ = {isa = PBXBuildFile; fileRef = 72BA1A431CCE0629006849E3 /* drawing.svg */; };
 		72BA1A4B1CCE0712006849E3 /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; };
 		72BA1A4C1CCE0712006849E3 /* CocoaLumberjack.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -145,6 +171,39 @@
 		122AADE61CCD475000677FF1 /* CSS.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CSS.svg; sourceTree = "<group>"; };
 		7277E2A61CCF43AF000D5E35 /* UIBezierPath-Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBezierPath-Points.h"; sourceTree = "<group>"; };
 		7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBezierPath-Points.m"; sourceTree = "<group>"; };
+		7297A5671CD99D13003682A1 /* Erase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Erase.caf; sourceTree = "<group>"; };
+		7297A5691CD99D13003682A1 /* Blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Blue.png; sourceTree = "<group>"; };
+		7297A56A1CD99D13003682A1 /* Green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Green.png; sourceTree = "<group>"; };
+		7297A56B1CD99D13003682A1 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
+		7297A56C1CD99D13003682A1 /* Icon-Small-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-Small-50.png"; sourceTree = "<group>"; };
+		7297A56D1CD99D13003682A1 /* Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-Small.png"; sourceTree = "<group>"; };
+		7297A56E1CD99D13003682A1 /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-Small@2x.png"; sourceTree = "<group>"; };
+		7297A56F1CD99D13003682A1 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		7297A5701CD99D13003682A1 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		7297A5711CD99D13003682A1 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
+		7297A5721CD99D13003682A1 /* Purple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Purple.png; sourceTree = "<group>"; };
+		7297A5731CD99D13003682A1 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
+		7297A5741CD99D13003682A1 /* Yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Yellow.png; sourceTree = "<group>"; };
+		7297A5751CD99D13003682A1 /* PaintingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaintingView.h; sourceTree = "<group>"; };
+		7297A5761CD99D13003682A1 /* PaintingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaintingView.m; sourceTree = "<group>"; };
+		7297A5771CD99D13003682A1 /* PaintingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaintingViewController.h; sourceTree = "<group>"; };
+		7297A5781CD99D13003682A1 /* PaintingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaintingViewController.m; sourceTree = "<group>"; };
+		7297A5791CD99D13003682A1 /* Recording.data */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Recording.data; sourceTree = "<group>"; };
+		7297A57A1CD99D13003682A1 /* Select.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Select.caf; sourceTree = "<group>"; };
+		7297A57C1CD99D13003682A1 /* point.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = point.fsh; sourceTree = "<group>"; };
+		7297A57D1CD99D13003682A1 /* point.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = point.vsh; sourceTree = "<group>"; };
+		7297A57E1CD99D13003682A1 /* SoundEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundEffect.h; sourceTree = "<group>"; };
+		7297A57F1CD99D13003682A1 /* SoundEffect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundEffect.m; sourceTree = "<group>"; };
+		7297A5811CD99D13003682A1 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
+		7297A5821CD99D13003682A1 /* fileUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fileUtil.h; sourceTree = "<group>"; };
+		7297A5831CD99D13003682A1 /* fileUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = fileUtil.m; sourceTree = "<group>"; };
+		7297A5841CD99D13003682A1 /* shaderUtil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = shaderUtil.c; sourceTree = "<group>"; };
+		7297A5851CD99D13003682A1 /* shaderUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shaderUtil.h; sourceTree = "<group>"; };
+		7297A5A11CD9A054003682A1 /* PaintingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PaintingViewController.xib; sourceTree = "<group>"; };
+		7297A5A31CD9A118003682A1 /* brush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush.png; sourceTree = "<group>"; };
+		7297A5A51CD9CD8F003682A1 /* CBrush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBrush.h; sourceTree = "<group>"; };
+		7297A5A61CD9CD8F003682A1 /* CBrush.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBrush.m; sourceTree = "<group>"; };
+		7297A5A91CD9D48A003682A1 /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
 		72BA1A431CCE0629006849E3 /* drawing.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = drawing.svg; sourceTree = "<group>"; };
 		72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = "3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS/CocoaLumberjack.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -209,6 +268,7 @@
 		122AABD81CCCA28800677FF1 /* calligraphyDemo */ = {
 			isa = PBXGroup;
 			children = (
+				7297A5661CD99D13003682A1 /* GLPaint */,
 				7277E29B1CCF0808000D5E35 /* categroy */,
 				122AADC81CCD345A00677FF1 /* SVG */,
 				122AABDC1CCCA28800677FF1 /* AppDelegate.h */,
@@ -297,6 +357,70 @@
 				7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */,
 			);
 			name = categroy;
+			sourceTree = "<group>";
+		};
+		7297A5661CD99D13003682A1 /* GLPaint */ = {
+			isa = PBXGroup;
+			children = (
+				7297A5671CD99D13003682A1 /* Erase.caf */,
+				7297A5681CD99D13003682A1 /* Images */,
+				7297A5751CD99D13003682A1 /* PaintingView.h */,
+				7297A5761CD99D13003682A1 /* PaintingView.m */,
+				7297A5771CD99D13003682A1 /* PaintingViewController.h */,
+				7297A5781CD99D13003682A1 /* PaintingViewController.m */,
+				7297A5A11CD9A054003682A1 /* PaintingViewController.xib */,
+				7297A5791CD99D13003682A1 /* Recording.data */,
+				7297A57A1CD99D13003682A1 /* Select.caf */,
+				7297A57B1CD99D13003682A1 /* Shaders */,
+				7297A57E1CD99D13003682A1 /* SoundEffect.h */,
+				7297A57F1CD99D13003682A1 /* SoundEffect.m */,
+				7297A5801CD99D13003682A1 /* UtilSrc */,
+				7297A5A51CD9CD8F003682A1 /* CBrush.h */,
+				7297A5A61CD9CD8F003682A1 /* CBrush.m */,
+			);
+			path = GLPaint;
+			sourceTree = "<group>";
+		};
+		7297A5681CD99D13003682A1 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				7297A5A91CD9D48A003682A1 /* brush1.png */,
+				7297A5A31CD9A118003682A1 /* brush.png */,
+				7297A5691CD99D13003682A1 /* Blue.png */,
+				7297A56A1CD99D13003682A1 /* Green.png */,
+				7297A56B1CD99D13003682A1 /* Icon-72.png */,
+				7297A56C1CD99D13003682A1 /* Icon-Small-50.png */,
+				7297A56D1CD99D13003682A1 /* Icon-Small.png */,
+				7297A56E1CD99D13003682A1 /* Icon-Small@2x.png */,
+				7297A56F1CD99D13003682A1 /* Icon.png */,
+				7297A5701CD99D13003682A1 /* Icon@2x.png */,
+				7297A5711CD99D13003682A1 /* iTunesArtwork */,
+				7297A5721CD99D13003682A1 /* Purple.png */,
+				7297A5731CD99D13003682A1 /* Red.png */,
+				7297A5741CD99D13003682A1 /* Yellow.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		7297A57B1CD99D13003682A1 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				7297A57C1CD99D13003682A1 /* point.fsh */,
+				7297A57D1CD99D13003682A1 /* point.vsh */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		7297A5801CD99D13003682A1 /* UtilSrc */ = {
+			isa = PBXGroup;
+			children = (
+				7297A5811CD99D13003682A1 /* debug.h */,
+				7297A5821CD99D13003682A1 /* fileUtil.h */,
+				7297A5831CD99D13003682A1 /* fileUtil.m */,
+				7297A5841CD99D13003682A1 /* shaderUtil.c */,
+				7297A5851CD99D13003682A1 /* shaderUtil.h */,
+			);
+			path = UtilSrc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -455,13 +579,33 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7297A5871CD99D13003682A1 /* Blue.png in Resources */,
+				7297A5921CD99D13003682A1 /* Yellow.png in Resources */,
+				7297A5981CD99D13003682A1 /* point.vsh in Resources */,
+				7297A5961CD99D13003682A1 /* Select.caf in Resources */,
+				7297A58E1CD99D13003682A1 /* Icon@2x.png in Resources */,
+				7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */,
 				122AADE81CCD475000677FF1 /* CSS.svg in Resources */,
+				7297A5971CD99D13003682A1 /* point.fsh in Resources */,
+				7297A5901CD99D13003682A1 /* Purple.png in Resources */,
+				7297A5861CD99D13003682A1 /* Erase.caf in Resources */,
+				7297A5951CD99D13003682A1 /* Recording.data in Resources */,
+				7297A58B1CD99D13003682A1 /* Icon-Small.png in Resources */,
+				7297A5891CD99D13003682A1 /* Icon-72.png in Resources */,
+				7297A5A41CD9A118003682A1 /* brush.png in Resources */,
 				122AABEC1CCCA28800677FF1 /* LaunchScreen.storyboard in Resources */,
+				7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */,
 				122AADE71CCD475000677FF1 /* Coins.svg in Resources */,
 				122AABE91CCCA28800677FF1 /* Assets.xcassets in Resources */,
 				72BA1A441CCE0629006849E3 /* drawing.svg in Resources */,
 				122AADCA1CCD345A00677FF1 /* Cycling_Lambie.svg in Resources */,
+				7297A5911CD99D13003682A1 /* Red.png in Resources */,
+				7297A58A1CD99D13003682A1 /* Icon-Small-50.png in Resources */,
 				122AABE71CCCA28800677FF1 /* Main.storyboard in Resources */,
+				7297A58D1CD99D13003682A1 /* Icon.png in Resources */,
+				7297A5881CD99D13003682A1 /* Green.png in Resources */,
+				7297A58C1CD99D13003682A1 /* Icon-Small@2x.png in Resources */,
+				7297A58F1CD99D13003682A1 /* iTunesArtwork in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -488,8 +632,14 @@
 			files = (
 				122AABDE1CCCA28800677FF1 /* AppDelegate.m in Sources */,
 				7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */,
+				7297A59B1CD99D13003682A1 /* shaderUtil.c in Sources */,
+				7297A5931CD99D13003682A1 /* PaintingView.m in Sources */,
 				122AABE11CCCA28800677FF1 /* MasterViewController.m in Sources */,
 				122AABDB1CCCA28800677FF1 /* main.m in Sources */,
+				7297A5941CD99D13003682A1 /* PaintingViewController.m in Sources */,
+				7297A59A1CD99D13003682A1 /* fileUtil.m in Sources */,
+				7297A5991CD99D13003682A1 /* SoundEffect.m in Sources */,
+				7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */,
 				122AABE41CCCA28800677FF1 /* DetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

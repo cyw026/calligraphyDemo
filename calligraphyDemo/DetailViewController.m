@@ -8,6 +8,7 @@
 
 #import "DetailViewController.h"
 #import "UIBezierPath-Points.h"
+#import "PaintingViewController.h"
 
 @interface DetailViewController () 
 {
@@ -51,6 +52,30 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     //[self configureView];
+    
+    [self initRightBarButtonWithImage:@"brush_tool_blue" highlightedImage:@"brush_tool_blue_pressed"];
+}
+
+- (void)initRightBarButtonWithImage:(NSString *)image highlightedImage:(NSString*)highlightedImage
+{
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, 0, 20, 30);
+    [button addTarget:self action:@selector(handleRightBarButton:) forControlEvents:UIControlEventTouchUpInside];
+    [button setImage:[UIImage imageNamed:image] forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:highlightedImage] forState:UIControlStateHighlighted];
+    UIBarButtonItem * leftItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.rightBarButtonItem = leftItem;
+}
+
+- (void)handleRightBarButton:(UIButton *)button
+{
+    PaintingViewController *vc = [[PaintingViewController alloc] initWithNibName:@"PaintingViewController" bundle:nil];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:nav animated:YES completion:^{
+        
+    }];
 }
 
 - (void)dealloc
