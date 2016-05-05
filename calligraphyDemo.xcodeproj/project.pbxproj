@@ -54,6 +54,8 @@
 		7297A5A41CD9A118003682A1 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A31CD9A118003682A1 /* brush.png */; };
 		7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5A61CD9CD8F003682A1 /* CBrush.m */; };
 		7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A91CD9D48A003682A1 /* brush1.png */; };
+		72A3966F1CDB286800D40D37 /* brush2.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A3966E1CDB286800D40D37 /* brush2.png */; };
+		72A396761CDB2D1200D40D37 /* brush3.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A396751CDB2D1200D40D37 /* brush3.png */; };
 		72BA1A441CCE0629006849E3 /* drawing.svg in Resources */ = {isa = PBXBuildFile; fileRef = 72BA1A431CCE0629006849E3 /* drawing.svg */; };
 		72BA1A4B1CCE0712006849E3 /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; };
 		72BA1A4C1CCE0712006849E3 /* CocoaLumberjack.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -204,6 +206,8 @@
 		7297A5A51CD9CD8F003682A1 /* CBrush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBrush.h; sourceTree = "<group>"; };
 		7297A5A61CD9CD8F003682A1 /* CBrush.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBrush.m; sourceTree = "<group>"; };
 		7297A5A91CD9D48A003682A1 /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
+		72A3966E1CDB286800D40D37 /* brush2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush2.png; sourceTree = "<group>"; };
+		72A396751CDB2D1200D40D37 /* brush3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush3.png; sourceTree = "<group>"; };
 		72BA1A431CCE0629006849E3 /* drawing.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = drawing.svg; sourceTree = "<group>"; };
 		72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = "3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS/CocoaLumberjack.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -384,7 +388,9 @@
 		7297A5681CD99D13003682A1 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				72A396751CDB2D1200D40D37 /* brush3.png */,
 				7297A5A91CD9D48A003682A1 /* brush1.png */,
+				72A3966E1CDB286800D40D37 /* brush2.png */,
 				7297A5A31CD9A118003682A1 /* brush.png */,
 				7297A5691CD99D13003682A1 /* Blue.png */,
 				7297A56A1CD99D13003682A1 /* Green.png */,
@@ -580,12 +586,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				7297A5871CD99D13003682A1 /* Blue.png in Resources */,
+				72A396761CDB2D1200D40D37 /* brush3.png in Resources */,
 				7297A5921CD99D13003682A1 /* Yellow.png in Resources */,
 				7297A5981CD99D13003682A1 /* point.vsh in Resources */,
 				7297A5961CD99D13003682A1 /* Select.caf in Resources */,
 				7297A58E1CD99D13003682A1 /* Icon@2x.png in Resources */,
 				7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */,
 				122AADE81CCD475000677FF1 /* CSS.svg in Resources */,
+				72A3966F1CDB286800D40D37 /* brush2.png in Resources */,
 				7297A5971CD99D13003682A1 /* point.fsh in Resources */,
 				7297A5901CD99D13003682A1 /* Purple.png in Resources */,
 				7297A5861CD99D13003682A1 /* Erase.caf in Resources */,

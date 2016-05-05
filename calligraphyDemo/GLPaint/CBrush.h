@@ -21,9 +21,10 @@ typedef struct {
 @interface CBrush : NSObject
 {
     //textureInfo_t texture;     // brush texture
-    GLfloat color[4];          // brush color
+    //GLfloat color[4];          // brush color
 }
 @property (nonatomic, assign) textureInfo_t texture;
+@property (nonatomic, assign) GLfloat *color;
 
 + (instancetype)createBrushWithTexture:(NSString *)textureName;
 

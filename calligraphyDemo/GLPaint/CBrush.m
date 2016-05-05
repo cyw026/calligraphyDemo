@@ -21,6 +21,13 @@
     
     brush.texture = [brush textureFromName:textureName];
     
+    brush.color = malloc(4*sizeof(GLfloat));
+    
+    brush.color[0] = 0.09;
+    brush.color[1] = 0.486;
+    brush.color[2] = 0.69;
+    brush.color[3] = 1.0;
+    
     return brush;
 }
 

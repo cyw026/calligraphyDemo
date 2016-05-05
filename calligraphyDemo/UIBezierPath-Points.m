@@ -227,4 +227,95 @@ void getBezierElements(void *info, const CGPathElement *element)
     
     return path;
 }
+
+/**
+ *  分解贝塞尔曲线
+ */
++ (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count {
+    
+    // 如果分解数量为0，生成默认分解数量
+    if (count == 0) {
+        int x1 = fabs(fPoint.x - tPoint.x);
+        int x2 = fabs(fPoint.y - tPoint.y);
+        count = (int)sqrt(pow(x1, 2) + pow(x2, 2));
+    }
+    
+    // 计算贝塞尔曲线
+    CGFloat s = 0.0;
+    NSMutableArray *t = [NSMutableArray array];
+    CGFloat pc = 1/(CGFloat)count;
+    
+    int power = (int)(points.count + 1);
+    
+    
+    for (int i =0; i<= count + 1; i++) {
+        
+        [t addObject:[NSNumber numberWithFloat:s]];
+        s = s + pc;
+        
+    }
+    
+    NSMutableArray *newPoints = [NSMutableArray array];
+    
+    for (int i =0; i<=count +1; i++) {
+        
+        CGFloat resultX = fPoint.x * [self bezMakerWithN:power K:0 T:[t[i] floatValue]] + tPoint.x * [self bezMakerWithN:power K:power T:[t[i] floatValue]];
+        
+        for (int j = 1; j<= power -1; j++) {
+            
+            resultX += [points[j-1] CGPointValue].x * [self bezMakerWithN:power K:j T:[t[i] floatValue]];
+            
+        }
+        
+        CGFloat resultY = fPoint.y * [self bezMakerWithN:power K:0 T:[t[i] floatValue]] + tPoint.y * [self bezMakerWithN:power K:power T:[t[i] floatValue]];
+        
+        for (int j = 1; j<= power -1; j++) {
+            
+            resultY += [points[j-1] CGPointValue].y * [self bezMakerWithN:power K:j T:[t[i] floatValue]];
+            
+        }
+        
+        [newPoints addObject:[NSValue valueWithCGPoint:CGPointMake(resultX, resultY)]];
+    }
+    return newPoints;
+    
+}
+
+
+
++ (CGFloat)compWithN:(int)n andK:(int)k {
+    int s1 = 1;
+    int s2 = 1;
+    
+    if (k == 0) {
+        return 1.0;
+    }
+    
+    for (int i = n; i>=n-k+1; i--) {
+        s1 = s1*i;
+    }
+    for (int i = k;i>=2;i--) {
+        s2 = s2 *i;
+    }
+    
+    CGFloat res = (CGFloat)s1/s2;
+    return  res;
+}
+
++ (CGFloat)realPowWithN:(CGFloat)n K:(int)k {
+    
+    if (k == 0) {
+        return 1.0;
+    }
+    
+    return pow(n, (CGFloat)k);
+}
+
++ (CGFloat)bezMakerWithN:(int)n K:(int)k T:(CGFloat)t {
+    
+    return [self compWithN:n andK:k] * [self realPowWithN:1-t K:n-k] * [self realPowWithN:t K:k];
+    
+    
+}
+
 @end

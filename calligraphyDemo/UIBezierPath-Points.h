@@ -19,4 +19,5 @@
 + (UIBezierPath *) pathWithElements: (NSArray *) elements;
 
 + (NSArray *) pointsAdjacent: (CGPathRef ) points withPoint:(CGPoint)point;
++ (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count;
 @end
