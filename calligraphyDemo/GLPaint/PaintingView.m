@@ -55,14 +55,10 @@
 #import "shaderUtil.h"
 #import "fileUtil.h"
 #import "debug.h"
-#import "CBrush.h"
+
 #import "UIBezierPath-Points.h"
 
 //CONSTANTS:
-
-#define kBrushOpacity		(1.0 / 3.0)
-#define kBrushPixelStep		3
-#define kBrushScale			2
 
 
 // Shaders
@@ -118,10 +114,9 @@ programInfo_t program[NUM_PROGRAMS] = {
 	
 	//textureInfo_t brushTexture;     // brush texture
     GLfloat brushColor[4];          // brush color
-    CBrush *myBrush;
     
     
-	Boolean	firstTouch;
+	
 	Boolean needsErase;
     
     // Shader objects
@@ -144,8 +139,7 @@ programInfo_t program[NUM_PROGRAMS] = {
     
 }
 
-// 当前宽度
-@property (nonatomic, assign) CGFloat currentWidth;
+
 
 @end
 
@@ -153,6 +147,7 @@ programInfo_t program[NUM_PROGRAMS] = {
 
 @synthesize  location;
 @synthesize  previousLocation;
+@synthesize  myBrush;
 
 // Implement this to override the default layer class (which is [CALayer class]).
 // We do this so that our view will be backed by a layer that is capable of OpenGL ES rendering.
@@ -316,13 +311,14 @@ programInfo_t program[NUM_PROGRAMS] = {
     glGenBuffers(1, &vboId);
     
     // Load the brush texture
-    myBrush = [CBrush createBrushWithTexture:@"brush3.png"];
+    myBrush = [CBrush createBrushWithTexture:@"brush.png"];
     
     // Load shaders
     [self setupShaders];
     
     // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
-    glEnable(GL_BLEND);
+    glEnable( GL_BLEND );   // 启用混合
+    //glDisable( GL_BLEND );  // 禁用关闭混合
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     
     // Playback recorded path, which is "Shake Me"
@@ -495,6 +491,74 @@ programInfo_t program[NUM_PROGRAMS] = {
 //	[context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
+- (void)renderLineFromPoint2:(CGPoint)start toPoint:(CGPoint)end
+{
+    static GLfloat*		vertexBuffer = NULL;
+    static NSUInteger	vertexMax = 64;
+    NSUInteger			vertexCount = 0,
+    count,
+    i;
+    
+    [EAGLContext setCurrentContext:context];
+    glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
+    
+    // Convert locations from Points to Pixels
+    CGFloat scale = self.contentScaleFactor;
+    start.x *= scale;
+    start.y *= scale;
+    end.x *= scale;
+    end.y *= scale;
+    
+    // Allocate vertex array buffer
+    if(vertexBuffer == NULL)
+        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
+    
+    // Add points to the buffer so there are drawing points every X pixels
+    count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+    for(i = 0; i < count; ++i) {
+        if(vertexCount == vertexMax) {
+            vertexMax = 2 * vertexMax;
+            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
+        }
+        
+        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
+        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
+        vertexCount += 1;
+    }
+    
+    // Load data to the Vertex Buffer Object
+    glBindBuffer(GL_ARRAY_BUFFER, vboId);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(ATTRIB_VERTEX);
+    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    // Draw
+        CGFloat width = 0.0;
+        glUseProgram(program[PROGRAM_POINT].id);
+        for (int i = 0; i < vertexCount; i++) {
+            width = self.currentWidth - 2.0/count * i;
+            if (width > 64) {
+                width = 64;
+            }
+            if (width < 10) {
+                width = 10;
+            }
+            glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], width);
+            glDrawArrays(GL_POINTS, i, (int)1);
+        }
+    
+        self.currentWidth = width;
+    
+    //glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], self.currentWidth);
+    // Draw
+    //glUseProgram(program[PROGRAM_POINT].id);
+    //glDrawArrays(GL_POINTS, 0, (int)vertexCount);
+    
+    // Display the buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+    [context presentRenderbuffer:GL_RENDERBUFFER];
+}
 // Reads previously recorded points and draws them onscreen. This is the Shake Me message that appears when the application launches.
 - (void)playback:(NSMutableArray*)recordedPaths
 {
@@ -565,7 +629,7 @@ programInfo_t program[NUM_PROGRAMS] = {
     pts[ctr] = p;
     if (ctr == 4)
     {
-        NSLog(@"touchesMoved:");
+        //NSLog(@"touchesMoved:");
               
         pts[3] = CGPointMake((pts[2].x + pts[4].x)/2.0, (pts[2].y + pts[4].y)/2.0); // move the endpoint to the middle of the line joining the second control point of the first Bezier segment and the first control point of the second Bezier segment
         [path moveToPoint:pts[0]];
@@ -610,7 +674,7 @@ programInfo_t program[NUM_PROGRAMS] = {
             to.y = bounds.size.height - to.y;
             
             float targetW = self.currentWidth + at2*i/len;
-            NSLog(@"targetW:%f", targetW);
+            //NSLog(@"targetW:%f", targetW);
             if (targetW > 64) {
                 targetW = 64;
             }
@@ -682,10 +746,15 @@ programInfo_t program[NUM_PROGRAMS] = {
 - (void)setBrushColorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue
 {
 	// Update the brush color
-    brushColor[0] = 0.09;
-    brushColor[1] = 0.486;
-    brushColor[2] = 0.69;
-    brushColor[3] = 1.0;
+//    brushColor[0] = 0.2;
+//    brushColor[1] = 0.6;
+//    brushColor[2] = 0.76;
+//    brushColor[3] = 0.9;
+    
+    brushColor[0] = 0.0;
+    brushColor[1] = 0.0;
+    brushColor[2] = 0.0;
+    brushColor[3] = 0.9;
     
     if (initialized) {
         glUseProgram(program[PROGRAM_POINT].id);

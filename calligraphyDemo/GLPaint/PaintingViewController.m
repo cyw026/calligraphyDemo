@@ -48,6 +48,7 @@
 #import "PaintingViewController.h"
 #import "PaintingView.h"
 #import "SoundEffect.h"
+#import "LiveCalligraphyView.h"
 
 //CONSTANTS:
 
@@ -56,7 +57,7 @@
 
 #define kPaletteHeight			30
 #define kPaletteSize			5
-#define kMinEraseInterval		0.5
+#define kMinEraseInterval		0.0
 
 // Padding for margins
 #define kLeftMargin				10.0
@@ -183,11 +184,16 @@
 - (void)eraseView
 {
 	if(CFAbsoluteTimeGetCurrent() > lastTime + kMinEraseInterval) {
-		[erasingSound play];
+		//[erasingSound play];
 		[(PaintingView *)self.view erase];
 		lastTime = CFAbsoluteTimeGetCurrent();
 	}
 }
+
+- (IBAction)eraseAction:(UIButton *)sender {
+    [self eraseView];
+}
+
 
 // We do not support auto-rotation in this sample
 - (BOOL)shouldAutorotate

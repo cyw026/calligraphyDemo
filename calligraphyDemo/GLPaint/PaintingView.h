@@ -51,15 +51,29 @@
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
+#import "CBrush.h"
+
+
+#define kBrushOpacity		(1.0 / 3.0)
+#define kBrushPixelStep		5
+#define kBrushScale			1
 
 //CLASS INTERFACES:
 
 @interface PaintingView : UIView
+{
+    Boolean	firstTouch;
+}
+// 当前宽度
+@property (nonatomic, assign) CGFloat currentWidth;
 
 @property(nonatomic, readwrite) CGPoint location;
 @property(nonatomic, readwrite) CGPoint previousLocation;
+@property(nonatomic, retain) CBrush *myBrush;
 
 - (void)erase;
 - (void)setBrushColorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue;
 
+- (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end;
+- (void)renderLineFromPoint2:(CGPoint)start toPoint:(CGPoint)end;
 @end

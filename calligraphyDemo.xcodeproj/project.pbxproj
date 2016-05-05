@@ -27,6 +27,10 @@
 		122AADE21CCD3FA200677FF1 /* libSVGKit-iOS.2.0.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 122AADD51CCD3F5E00677FF1 /* libSVGKit-iOS.2.0.0.a */; };
 		122AADE71CCD475000677FF1 /* Coins.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE51CCD475000677FF1 /* Coins.svg */; };
 		122AADE81CCD475000677FF1 /* CSS.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE61CCD475000677FF1 /* CSS.svg */; };
+		126DC1B11CDB935700BFD1E2 /* brush4.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B01CDB935700BFD1E2 /* brush4.png */; };
+		126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */; };
+		126DC1B61CDBA43D00BFD1E2 /* brush_baby2.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */; };
+		126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B71CDBBBC200BFD1E2 /* brush5.png */; };
 		7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */ = {isa = PBXBuildFile; fileRef = 7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */; };
 		7297A5861CD99D13003682A1 /* Erase.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5671CD99D13003682A1 /* Erase.caf */; };
 		7297A5871CD99D13003682A1 /* Blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5691CD99D13003682A1 /* Blue.png */; };
@@ -171,6 +175,11 @@
 		122AADCB1CCD3F5E00677FF1 /* SVGKit-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "SVGKit-iOS.xcodeproj"; sourceTree = "<group>"; };
 		122AADE51CCD475000677FF1 /* Coins.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Coins.svg; sourceTree = "<group>"; };
 		122AADE61CCD475000677FF1 /* CSS.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CSS.svg; sourceTree = "<group>"; };
+		126DC1B01CDB935700BFD1E2 /* brush4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush4.png; sourceTree = "<group>"; };
+		126DC1B21CDB9CB100BFD1E2 /* LiveCalligraphyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveCalligraphyView.h; sourceTree = "<group>"; };
+		126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiveCalligraphyView.m; sourceTree = "<group>"; };
+		126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush_baby2.png; sourceTree = "<group>"; };
+		126DC1B71CDBBBC200BFD1E2 /* brush5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush5.png; sourceTree = "<group>"; };
 		7277E2A61CCF43AF000D5E35 /* UIBezierPath-Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBezierPath-Points.h"; sourceTree = "<group>"; };
 		7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBezierPath-Points.m"; sourceTree = "<group>"; };
 		7297A5671CD99D13003682A1 /* Erase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Erase.caf; sourceTree = "<group>"; };
@@ -381,6 +390,8 @@
 				7297A5801CD99D13003682A1 /* UtilSrc */,
 				7297A5A51CD9CD8F003682A1 /* CBrush.h */,
 				7297A5A61CD9CD8F003682A1 /* CBrush.m */,
+				126DC1B21CDB9CB100BFD1E2 /* LiveCalligraphyView.h */,
+				126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */,
 			);
 			path = GLPaint;
 			sourceTree = "<group>";
@@ -388,6 +399,9 @@
 		7297A5681CD99D13003682A1 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				126DC1B71CDBBBC200BFD1E2 /* brush5.png */,
+				126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */,
+				126DC1B01CDB935700BFD1E2 /* brush4.png */,
 				72A396751CDB2D1200D40D37 /* brush3.png */,
 				7297A5A91CD9D48A003682A1 /* brush1.png */,
 				72A3966E1CDB286800D40D37 /* brush2.png */,
@@ -498,6 +512,7 @@
 				TargetAttributes = {
 					122AABD51CCCA28800677FF1 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = YM5LL43GU9;
 					};
 					122AABF11CCCA28800677FF1 = {
 						CreatedOnToolsVersion = 7.3;
@@ -590,8 +605,10 @@
 				7297A5921CD99D13003682A1 /* Yellow.png in Resources */,
 				7297A5981CD99D13003682A1 /* point.vsh in Resources */,
 				7297A5961CD99D13003682A1 /* Select.caf in Resources */,
+				126DC1B11CDB935700BFD1E2 /* brush4.png in Resources */,
 				7297A58E1CD99D13003682A1 /* Icon@2x.png in Resources */,
 				7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */,
+				126DC1B61CDBA43D00BFD1E2 /* brush_baby2.png in Resources */,
 				122AADE81CCD475000677FF1 /* CSS.svg in Resources */,
 				72A3966F1CDB286800D40D37 /* brush2.png in Resources */,
 				7297A5971CD99D13003682A1 /* point.fsh in Resources */,
@@ -605,6 +622,7 @@
 				7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */,
 				122AADE71CCD475000677FF1 /* Coins.svg in Resources */,
 				122AABE91CCCA28800677FF1 /* Assets.xcassets in Resources */,
+				126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */,
 				72BA1A441CCE0629006849E3 /* drawing.svg in Resources */,
 				122AADCA1CCD345A00677FF1 /* Cycling_Lambie.svg in Resources */,
 				7297A5911CD99D13003682A1 /* Red.png in Resources */,
@@ -645,6 +663,7 @@
 				122AABE11CCCA28800677FF1 /* MasterViewController.m in Sources */,
 				122AABDB1CCCA28800677FF1 /* main.m in Sources */,
 				7297A5941CD99D13003682A1 /* PaintingViewController.m in Sources */,
+				126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */,
 				7297A59A1CD99D13003682A1 /* fileUtil.m in Sources */,
 				7297A5991CD99D13003682A1 /* SoundEffect.m in Sources */,
 				7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */,

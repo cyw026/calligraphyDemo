@@ -49,4 +49,9 @@
 
 @interface PaintingViewController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UIButton *btn_brush_01;
+@property (weak, nonatomic) IBOutlet UIButton *btn_brush_02;
+@property (weak, nonatomic) IBOutlet UIButton *btn_brush_03;
+@property (weak, nonatomic) IBOutlet UIButton *btn_clear;
+
 @end
