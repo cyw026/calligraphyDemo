@@ -31,6 +31,7 @@
 		126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */; };
 		126DC1B61CDBA43D00BFD1E2 /* brush_baby2.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */; };
 		126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B71CDBBBC200BFD1E2 /* brush5.png */; };
+		126DC1BC1CDF83E700BFD1E2 /* test.svg in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1BB1CDF83E700BFD1E2 /* test.svg */; };
 		7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */ = {isa = PBXBuildFile; fileRef = 7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */; };
 		7297A5861CD99D13003682A1 /* Erase.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5671CD99D13003682A1 /* Erase.caf */; };
 		7297A5871CD99D13003682A1 /* Blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5691CD99D13003682A1 /* Blue.png */; };
@@ -180,6 +181,7 @@
 		126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiveCalligraphyView.m; sourceTree = "<group>"; };
 		126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush_baby2.png; sourceTree = "<group>"; };
 		126DC1B71CDBBBC200BFD1E2 /* brush5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush5.png; sourceTree = "<group>"; };
+		126DC1BB1CDF83E700BFD1E2 /* test.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test.svg; sourceTree = "<group>"; };
 		7277E2A61CCF43AF000D5E35 /* UIBezierPath-Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBezierPath-Points.h"; sourceTree = "<group>"; };
 		7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBezierPath-Points.m"; sourceTree = "<group>"; };
 		7297A5671CD99D13003682A1 /* Erase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Erase.caf; sourceTree = "<group>"; };
@@ -342,6 +344,7 @@
 		122AADC81CCD345A00677FF1 /* SVG */ = {
 			isa = PBXGroup;
 			children = (
+				126DC1BB1CDF83E700BFD1E2 /* test.svg */,
 				72BA1A431CCE0629006849E3 /* drawing.svg */,
 				122AADE51CCD475000677FF1 /* Coins.svg */,
 				122AADE61CCD475000677FF1 /* CSS.svg */,
@@ -622,6 +625,7 @@
 				7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */,
 				122AADE71CCD475000677FF1 /* Coins.svg in Resources */,
 				122AABE91CCCA28800677FF1 /* Assets.xcassets in Resources */,
+				126DC1BC1CDF83E700BFD1E2 /* test.svg in Resources */,
 				126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */,
 				72BA1A441CCE0629006849E3 /* drawing.svg in Resources */,
 				122AADCA1CCD345A00677FF1 /* Cycling_Lambie.svg in Resources */,

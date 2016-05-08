@@ -95,7 +95,7 @@
     
     
     //FIXME: 这里使用异步方式解析XML报错，暂时没找到原因先采用同步加载方式
-    SVGKImage *document = [SVGKImage imageNamed:@"drawing.svg"];
+    SVGKImage *document = [SVGKImage imageNamed:@"test.svg"];
     [self internalLoadedResource:svgSource parserOutput:nil createImageViewFromDocument:document];
 
     // 异步解析
@@ -172,9 +172,12 @@
         /** set the border for new item */
         self.contentView.showBorder = FALSE;
         
-        self.contentView.frame = CGRectMake(0, 64, 600, 300);
+        CGFloat width = self.view.frame.size.width;
+        CGFloat height = self.view.frame.size.height;
         
-        self.contentView.layer.backgroundColor = [UIColor blueColor].CGColor;
+        self.contentView.frame = CGRectMake(0, (height - width)*0.5, width, width);
+        
+        //self.contentView.layer.backgroundColor = [UIColor blueColor].CGColor;
         
         [self.view addSubview:self.contentView];
         
@@ -223,12 +226,19 @@
         
         CGContextSaveGState(ctx);
         CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
-        CGContextSetLineWidth(ctx, 60);
+        CGContextSetLineWidth(ctx, 2);
         
         UIBezierPath *drawingPath = [layer valueForKey:kDrawingPathKey];
         CGContextAddPath(ctx, drawingPath.CGPath);
         
         CGContextStrokePath(ctx);
+        
+//        CGContextSetFillColorWithColor(ctx, [UIColor blackColor].CGColor);
+//        
+//        UIBezierPath *drawingPath = [layer valueForKey:kDrawingPathKey];
+//        CGContextAddPath(ctx, drawingPath.CGPath);
+//        
+//        CGContextFillPath(ctx);
         
         CGContextSaveGState(ctx);
         
@@ -269,6 +279,11 @@
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
         SVGKImage *image = layerForHitTesting.SVGImage;
         
+        Element* elementsUsingTagG = [image.DOMDocument getElementById:@"path4516"];
+        NSLog( @"checking for SVG standard set of elements with XML tag/node of <g>: %@", elementsUsingTagG );
+        
+        SVGGElement *parentNode = (SVGGElement*)elementsUsingTagG.parentNode;
+        
         NSLog(@"hitLayer.DOMTree:%@", image.DOMTree);
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
         //SVGKImage *hitLayerImage = hitLayer.SVGImage;
@@ -306,7 +321,7 @@
         
     
         
-        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]] && hitLayer.mask) {
+        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
             // 判断当前选中的是否为笔画的形状图层
             //hitLayer.strokeColor = [UIColor blackColor].CGColor;
             hitLayer.lineWidth = 0;
@@ -321,18 +336,28 @@
             lastTappedLayer.delegate = self;
             
             //
-            CGPoint touchPoint = [hitLayer convertPoint:p fromLayer:self.view.layer];
+            CAShapeLayer *layer_m = (CAShapeLayer*)[image layerWithIdentifier:@"path9538"];
+            CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4701"];
+            CAShapeLayer *layer_r = (CAShapeLayer*)[image layerWithIdentifier:@"path4699"];
+            
+            CGPathRef path_m = layer_m.path;
+            CGPathRef path_l = layer_l.path;
+            CGPathRef path_r = layer_r.path;
+            
+            CGPoint touchPoint = [layer_m convertPoint:p fromLayer:self.view.layer];
             NSLog(@"touchPoint:%@", NSStringFromCGPoint(touchPoint));
-            NSArray *nearest = [UIBezierPath pointsAdjacent:hitLayer.path withPoint:touchPoint];
+            
+            CGPoint p0 = [UIBezierPath pointAdjacent:path_m withPoint:touchPoint];
+            CGPoint p1 = [UIBezierPath pointAdjacent:path_l withPoint:[layer_l convertPoint:p0 fromLayer:layer_m]];
+            CGPoint p2 = [UIBezierPath pointAdjacent:path_r withPoint:[layer_r convertPoint:p0 fromLayer:layer_m]];
             
             UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
             if (drawingPath == nil) {
                 drawingPath = [UIBezierPath bezierPath];
                 [hitLayer setValue:drawingPath forKey:kDrawingPathKey];
             }
-            if ([nearest firstObject]) {
-                [drawingPath moveToPoint:[(NSValue *)[nearest firstObject] CGPointValue]];
-            }
+            
+            [drawingPath moveToPoint:p1];
         }
 //        else {
 //            if (lastTappedLayer != nil) {
@@ -351,6 +376,7 @@
     
     UITouch *touch = touches.anyObject;
     CGPoint p = [touch locationInView:self.view];
+    CGPoint prevPoint = [touch previousLocationInView:self.view];
     
     NSValue *vp = [NSValue valueWithCGPoint:p];
     
@@ -375,20 +401,38 @@
 //        
 //        CALayer* hitLayer = [layerForHitTesting hitTest:p];
         
+        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.contentView.layer;
+        SVGKImage *image = layerForHitTesting.SVGImage;
+        
+        CAShapeLayer *layer_m = (CAShapeLayer*)[image layerWithIdentifier:@"path9538"];
+        CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4701"];
+        CAShapeLayer *layer_r = (CAShapeLayer*)[image layerWithIdentifier:@"path4699"];
+        
+        CGPathRef path_m = layer_m.path;
+        CGPathRef path_l = layer_l.path;
+        CGPathRef path_r = layer_r.path;
+        
+        
         if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
-            CGPoint touchPoint = [lastTappedLayer convertPoint:p fromLayer:self.view.layer];
+            CGPoint touchPoint = [layer_m convertPoint:p fromLayer:self.view.layer];
             
+            CGPoint p0 = [UIBezierPath pointAdjacent:path_m withPoint:touchPoint];
+            CGPoint p1 = [UIBezierPath pointAdjacent:path_l withPoint:[layer_l convertPoint:p0 fromLayer:layer_m]];
+            CGPoint p2 = [UIBezierPath pointAdjacent:path_r withPoint:[layer_r convertPoint:p0 fromLayer:layer_m]];
             
-            NSArray *nearest = [UIBezierPath pointsAdjacent:lastTappedLayer.path withPoint:touchPoint];
-            
+                        
             UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
             
-            for (int i = 0; i < nearest.count; i++) {
-                CGPoint nearestPoint = [(NSValue *)[nearest objectAtIndex:i] CGPointValue];
-                NSLog(@"nearestPoint:%@", NSStringFromCGPoint(nearestPoint));
-                [drawingPath addLineToPoint:nearestPoint];
-            }
+            //CGMutablePathRef newPath = CGPathCreateMutableCopy(drawingPath.CGPath);
+            //CGPathAddPath(newPath, nil, path_l);
+            //CGPathAddPath(newPath, nil, path_r);
+            //CGPathAddLineToPoint(newPath, nil, p1.x, p1.y);
+            //CGPathAddLineToPoint(newPath, nil, p2.x, p2.y);
+            
+            [drawingPath addLineToPoint:[lastTappedLayer convertPoint:p1 fromLayer:layer_l]];
+            [drawingPath addLineToPoint:[lastTappedLayer convertPoint:p2 fromLayer:layer_r]];
+            //drawingPath.CGPath = newPath;
             
             lastTappedLayer.delegate = self;
             [lastTappedLayer setNeedsDisplay];

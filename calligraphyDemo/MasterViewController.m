@@ -25,7 +25,7 @@
     self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
-    self.objects = [NSMutableArray arrayWithObjects:@"drawing", nil];
+    self.objects = [NSMutableArray arrayWithObjects:@"test", nil];
     
 }
 
