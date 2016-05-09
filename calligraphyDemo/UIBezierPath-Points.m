@@ -119,6 +119,11 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
 
 + (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point
 {
+    NSUInteger index = 1;
+    return [self pointAdjacent:path withPoint:point index:&index];
+}
++ (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point index:(NSUInteger *)index
+{
     NSMutableArray *points = [NSMutableArray array];
     CGPathApply(path, (__bridge void *)points, getPointsFromBezier);
     
@@ -126,16 +131,110 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     CGPoint nearestPoint = POINT(0);
     float nearestDist = distance(point, POINT(0));
     
-    for (int i = 1; i < pointCount; i++)
+    for (NSUInteger i = 1; i < pointCount; i++)
     {
         float tempDist = distance(point, POINT(i));
         if (distance(point, POINT(i)) < nearestDist) {
             nearestPoint = POINT(i);
             nearestDist = tempDist;
+            *index = i;
         }
     }
     return nearestPoint;
 }
+
+- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end
+{
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    
+    NSArray *elements = [self bezierElements];
+    
+    if (elements.count == 0) return path;
+    
+    float distance1 = 9999;
+    float distance2 = 9999;
+    NSUInteger startIndex = 0;
+    NSUInteger endIndex = 0;
+    
+    for (NSArray *points in elements)
+    {
+        if (!points.count)
+            continue;
+        CGPathElementType elementType = [points[0] integerValue];
+        NSUInteger index = [elements indexOfObject:points];
+        
+        switch (elementType)
+        {
+            case kCGPathElementCloseSubpath:
+                [path closePath];
+                break;
+            case kCGPathElementMoveToPoint:
+                if (points.count == 2)
+                    [path moveToPoint:POINT(1)];
+                break;
+            case kCGPathElementAddLineToPoint:
+                if (points.count == 2)
+                {
+                    float tempDist = distance(start, POINT(1));
+                    if (tempDist < distance1) {
+                        distance1 = tempDist;
+                        startIndex = index;
+                    }
+                    tempDist = distance(end, POINT(1));
+                    if (tempDist < distance2) {
+                        distance2 = tempDist;
+                        endIndex = index;
+                    }
+                }
+                    //[path addLineToPoint:POINT(1)];
+                break;
+            case kCGPathElementAddQuadCurveToPoint:
+                if (points.count == 3)
+                {
+                    float tempDist = distance(start, POINT(2));
+                    if (tempDist < distance1) {
+                        distance1 = tempDist;
+                        startIndex = [elements indexOfObject:points];
+                    }
+                    tempDist = distance(end, POINT(2));
+                    if (tempDist < distance2) {
+                        distance2 = tempDist;
+                        endIndex = index;
+                    }
+                }
+                    //[path addQuadCurveToPoint:POINT(2) controlPoint:POINT(1)];
+                break;
+            case kCGPathElementAddCurveToPoint:
+                if (points.count == 4)
+                {
+                    float tempDist = distance(start, POINT(2));
+                    if (tempDist < distance1) {
+                        distance1 = tempDist;
+                        startIndex = index;
+                    }
+                    tempDist = distance(end, POINT(2));
+                    if (tempDist < distance2) {
+                        distance2 = tempDist;
+                        endIndex = index;
+                    }
+                }
+                    //[path addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
+                break;
+        }
+    }
+    
+    NSLog(@"startIndex:%ld, endIndex:%ld", startIndex, endIndex);
+    NSMutableArray *newElements = [NSMutableArray array];
+    NSArray *array = elements[startIndex];
+    [newElements addObject:@[@(kCGPathElementMoveToPoint), array[1]]];
+    
+    for (NSUInteger i = startIndex+1; i <= endIndex; i++) {
+        [newElements addObject:elements[i]];
+    }
+    
+    return [UIBezierPath pathWithElements:newElements];
+}
+
 
 - (CGPoint) pointAtPercent: (CGFloat) percent withSlope: (CGPoint *) slope
 {
@@ -246,6 +345,197 @@ void getBezierElements(void *info, const CGPathElement *element)
     }
     
     return path;
+}
+
++ (UIBezierPath *) pathWithPath: (UIBezierPath *) path
+{
+    UIBezierPath *newPath = [UIBezierPath bezierPath];
+    NSArray *elements = [path bezierElements];
+    if (elements.count == 0) return newPath;
+    
+    for (NSArray *points in elements)
+    {
+        if (!points.count) continue;
+        CGPathElementType elementType = [points[0] integerValue];
+        switch (elementType)
+        {
+            case kCGPathElementCloseSubpath:
+                [path closePath];
+                break;
+            case kCGPathElementMoveToPoint:
+                if (points.count == 2)
+                    [path moveToPoint:POINT(1)];
+                break;
+            case kCGPathElementAddLineToPoint:
+                if (points.count == 2)
+                {
+                    CGPoint startPoint = [path currentPoint];
+                    CGPoint lineTo =  POINT(1);
+                    
+                    float dist = distance([path currentPoint], POINT(1));
+                    NSInteger steps = MAX(floor(dist / 1), 1);
+                    for(NSInteger step = 0; step < steps; step++) {
+                        // 0 <= t < 1
+                        CGFloat t = (CGFloat)step / (CGFloat)steps;
+                        
+                        // calculate the point along the line
+                        CGPoint point = CGPointMake(startPoint.x + (lineTo.x - startPoint.x) * t,
+                                                    startPoint.y + (lineTo.y - startPoint.y) * t);
+                        [path addLineToPoint:point];
+                    }
+                }
+                break;
+            case kCGPathElementAddQuadCurveToPoint:
+                if (points.count == 3)
+                    [path addQuadCurveToPoint:POINT(2) controlPoint:POINT(1)];
+                break;
+            case kCGPathElementAddCurveToPoint:
+                if (points.count == 4)
+                {
+//                    CGPoint startPoint = [path currentPoint];
+//                    CGPoint curveTo =  POINT(3);
+//                    
+//                    CGPoint rightBez[4], leftBez[4];
+//                    CGPoint bez[4];
+//                    bez[0] = startPoint;
+//                    bez[1] = POINT(1);
+//                    bez[2] = POINT(2);
+//                    bez[3] = curveTo;
+//                    
+//                    CGFloat length = lengthOfBezier(bez, .1);
+//                    NSInteger numberOfSteps = MAX(floor(length / 1), 1);
+//                    CGFloat realStepSize = length / numberOfSteps;
+//                    
+//                    for(int step = 0; step < numberOfSteps; step++) {
+//                        // calculate the point that is realStepSize distance
+//                        // along the curve * which step we're on
+//                        
+//                        subdivideBezierAtLength(bez, leftBez, rightBez, realStepSize*step, .05);
+//                        CGPoint point = rightBez[0];
+//                        [path addLineToPoint:point];
+//                    }
+                    
+                    
+                }
+                    [path addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
+                break;
+        }
+    }
+    
+    return path;
+}
+
+#pragma mark - Helper
+
+/**
+ * will divide a bezier curve into two curves at time t
+ * 0 <= t <= 1.0
+ *
+ * these two curves will exactly match the former single curve
+ */
+static inline void subdivideBezierAtT(const CGPoint bez[4], CGPoint bez1[4], CGPoint bez2[4], CGFloat t){
+    CGPoint q;
+    CGFloat mt = 1 - t;
+    
+    bez1[0].x = bez[0].x;
+    bez1[0].y = bez[0].y;
+    bez2[3].x = bez[3].x;
+    bez2[3].y = bez[3].y;
+    
+    q.x = mt * bez[1].x + t * bez[2].x;
+    q.y = mt * bez[1].y + t * bez[2].y;
+    bez1[1].x = mt * bez[0].x + t * bez[1].x;
+    bez1[1].y = mt * bez[0].y + t * bez[1].y;
+    bez2[2].x = mt * bez[2].x + t * bez[3].x;
+    bez2[2].y = mt * bez[2].y + t * bez[3].y;
+    
+    bez1[2].x = mt * bez1[1].x + t * q.x;
+    bez1[2].y = mt * bez1[1].y + t * q.y;
+    bez2[1].x = mt * q.x + t * bez2[2].x;
+    bez2[1].y = mt * q.y + t * bez2[2].y;
+    
+    bez1[3].x = bez2[0].x = mt * bez1[2].x + t * bez2[1].x;
+    bez1[3].y = bez2[0].y = mt * bez1[2].y + t * bez2[1].y;
+}
+
+/**
+ * divide the input curve at its halfway point
+ */
+static inline void subdivideBezier(const CGPoint bez[4], CGPoint bez1[4], CGPoint bez2[4]){
+    subdivideBezierAtT(bez, bez1, bez2, .5);
+}
+
+/**
+ * calculates the distance between two points
+ */
+static inline CGFloat distanceBetween(CGPoint a, CGPoint b){
+    return hypotf( a.x - b.x, a.y - b.y );
+}
+/**
+ * estimates the length along the curve of the
+ * input bezier within the input acceptableError
+ */
+CGFloat lengthOfBezier(const  CGPoint bez[4], CGFloat acceptableError){
+    CGFloat   polyLen = 0.0;
+    CGFloat   chordLen = distanceBetween (bez[0], bez[3]);
+    CGFloat   retLen, errLen;
+    NSUInteger n;
+    
+    for (n = 0; n < 3; ++n)
+        polyLen += distanceBetween (bez[n], bez[n + 1]);
+    
+    errLen = polyLen - chordLen;
+    
+    if (errLen > acceptableError) {
+        CGPoint left[4], right[4];
+        subdivideBezier (bez, left, right);
+        retLen = (lengthOfBezier (left, acceptableError)
+                  + lengthOfBezier (right, acceptableError));
+    } else {
+        retLen = 0.5 * (polyLen + chordLen);
+    }
+    
+    return retLen;
+}
+
+/**
+ * will split the input bezier curve at the input length
+ * within a given margin of error
+ *
+ * the two curves will exactly match the original curve
+ */
+static CGFloat subdivideBezierAtLength (const CGPoint bez[4],
+                                        CGPoint bez1[4],
+                                        CGPoint bez2[4],
+                                        CGFloat length,
+                                        CGFloat acceptableError){
+    CGFloat top = 1.0, bottom = 0.0;
+    CGFloat t, prevT;
+    
+    prevT = t = 0.5;
+    for (;;) {
+        CGFloat len1;
+        
+        subdivideBezierAtT (bez, bez1, bez2, t);
+        
+        len1 = lengthOfBezier (bez1, 0.5 * acceptableError);
+        
+        if (fabs (length - len1) < acceptableError)
+            return len1;
+        
+        if (length > len1) {
+            bottom = t;
+            t = 0.5 * (t + top);
+        } else if (length < len1) {
+            top = t;
+            t = 0.5 * (bottom + t);
+        }
+        
+        if (t == prevT)
+            return len1;
+        
+        prevT = t;
+    }
 }
 
 /**

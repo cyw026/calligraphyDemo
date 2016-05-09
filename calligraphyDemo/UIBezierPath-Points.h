@@ -17,8 +17,11 @@
 - (CGPoint) pointAtPercent: (CGFloat) percent withSlope: (CGPoint *) slope;
 + (UIBezierPath *) pathWithPoints: (NSArray *) points;
 + (UIBezierPath *) pathWithElements: (NSArray *) elements;
++ (UIBezierPath *) pathWithPath: (UIBezierPath *) path;
 
 + (NSArray *) pointsAdjacent: (CGPathRef ) points withPoint:(CGPoint)point;
 + (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point;
++ (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point index:(NSUInteger *)index;
 + (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count;
+- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end;
 @end
