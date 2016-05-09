@@ -225,19 +225,20 @@
 //        UIGraphicsPopContext();
         
         CGContextSaveGState(ctx);
-        CGContextSetStrokeColorWithColor(ctx, [UIColor redColor].CGColor);
+        CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
+        CGContextSetFillColorWithColor(ctx, [UIColor blackColor].CGColor);
         
         CGContextSetLineJoin(ctx, kCGLineJoinBevel);
         CGContextSetLineCap(ctx, kCGLineCapButt);
-        CGContextSetLineWidth(ctx, 5);
+        CGContextSetLineWidth(ctx, 2);
         
         UIBezierPath *drawingPath = [layer valueForKey:kDrawingPathKey];
         CGContextAddPath(ctx, drawingPath.CGPath);
         
         
-        CGContextStrokePath(ctx);
+        //CGContextStrokePath(ctx);
         
-        //CGContextSetFillColorWithColor(ctx, [UIColor blackColor].CGColor);
+        
         //CGContextSetLineJoin(ctx, kCGLineJoinRound);
         //CGContextSetLineCap(ctx, kCGLineCapRound);
         //CGContextSetLineWidth(ctx, 5);
@@ -246,6 +247,8 @@
         //CGContextAddPath(ctx, drawingPath.CGPath);
         
         //CGContextFillPath(ctx);
+        
+        CGContextDrawPath(ctx, kCGPathFillStroke);
         
         CGContextSaveGState(ctx);
         
@@ -349,7 +352,7 @@
             
             //
             CAShapeLayer *layer_m = (CAShapeLayer*)[image layerWithIdentifier:@"path9538"];
-            CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4701"];
+            CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4144"];
             CAShapeLayer *layer_r = (CAShapeLayer*)[image layerWithIdentifier:@"path4162"];
 
             
@@ -428,7 +431,7 @@
         SVGKImage *image = layerForHitTesting.SVGImage;
         
         CAShapeLayer *layer_m = (CAShapeLayer*)[image layerWithIdentifier:@"path9538"];
-        CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4701"];
+        CAShapeLayer *layer_l = (CAShapeLayer*)[image layerWithIdentifier:@"path4144"];
         CAShapeLayer *layer_r = (CAShapeLayer*)[image layerWithIdentifier:@"path4162"];
         
         
@@ -467,19 +470,25 @@
             
                         
             UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-            UIBezierPath *newPath = [UIBezierPath bezierPath];
             
-            [newPath moveToPoint:p1];
-            [newPath addLineToPoint:p2];
+            
+            
+            UIBezierPath *leftPath = [bezierPath_l pathWithStart:[layer_l convertPoint:p0 fromLayer:layer_m] end:[layer_l convertPoint:pp0 fromLayer:layer_m]];
             
             UIBezierPath *rightPath = [bezierPath_r pathWithStart:[layer_r convertPoint:p0 fromLayer:layer_m] end:[layer_r convertPoint:pp0 fromLayer:layer_m]];
             
-            [newPath appendPath:rightPath];
+            leftPath = [leftPath covertPathFromLayer:layer_l toLayer:lastTappedLayer];
+            rightPath = [rightPath covertPathFromLayer:layer_r toLayer:lastTappedLayer];
+            [leftPath closePath];
+            //[rightPath closePath];
             
-            [newPath addLineToPoint:pp1];
-            //[newPath closePath];
+            CGMutablePathRef newPath = CGPathCreateMutableCopy(drawingPath.CGPath);
             
-            [drawingPath appendPath:rightPath];
+        
+            CGPathAddPath(newPath, NULL, leftPath.CGPath);
+            CGPathAddPath(newPath, NULL, rightPath.CGPath);
+            drawingPath.CGPath = newPath;
+            
             
             lastTappedLayer.delegate = self;
             [lastTappedLayer setNeedsDisplay];

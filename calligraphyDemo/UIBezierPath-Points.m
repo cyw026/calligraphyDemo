@@ -180,9 +180,9 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
                         distance1 = tempDist;
                         startIndex = index;
                     }
-                    tempDist = distance(end, POINT(1));
-                    if (tempDist < distance2) {
-                        distance2 = tempDist;
+                    float ED = distance(end, POINT(1));
+                    if (ED < distance2) {
+                        distance2 = ED;
                         endIndex = index;
                     }
                 }
@@ -196,9 +196,9 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
                         distance1 = tempDist;
                         startIndex = [elements indexOfObject:points];
                     }
-                    tempDist = distance(end, POINT(2));
-                    if (tempDist < distance2) {
-                        distance2 = tempDist;
+                    float ED = distance(end, POINT(2));
+                    if (ED < distance2) {
+                        distance2 = ED;
                         endIndex = index;
                     }
                 }
@@ -207,14 +207,14 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
             case kCGPathElementAddCurveToPoint:
                 if (points.count == 4)
                 {
-                    float tempDist = distance(start, POINT(2));
+                    float tempDist = distance(start, POINT(3));
                     if (tempDist < distance1) {
                         distance1 = tempDist;
                         startIndex = index;
                     }
-                    tempDist = distance(end, POINT(2));
-                    if (tempDist < distance2) {
-                        distance2 = tempDist;
+                    float ED = distance(end, POINT(3));
+                    if (ED < distance2) {
+                        distance2 = ED;
                         endIndex = index;
                     }
                 }
@@ -233,6 +233,59 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     }
     
     return [UIBezierPath pathWithElements:newElements];
+}
+
+- (UIBezierPath *)covertPathFromLayer:(CALayer *)from toLayer:(CALayer*)to
+{
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    NSArray *elements = [self bezierElements];
+    
+    if (elements.count == 0) return path;
+    
+    for (NSArray *points in elements)
+    {
+        if (!points.count) continue;
+        CGPathElementType elementType = [points[0] integerValue];
+        switch (elementType)
+        {
+            case kCGPathElementCloseSubpath:
+                [path closePath];
+                break;
+            case kCGPathElementMoveToPoint:
+                if (points.count == 2)
+                {
+                    CGPoint point = [to convertPoint:POINT(1) fromLayer:from];
+                    [path moveToPoint:point];
+                }
+                break;
+            case kCGPathElementAddLineToPoint:
+                if (points.count == 2)
+                {
+                    CGPoint point = [to convertPoint:POINT(1) fromLayer:from];
+                    [path addLineToPoint:point];
+                }
+                break;
+            case kCGPathElementAddQuadCurveToPoint:
+                if (points.count == 3)
+                {
+                    CGPoint curveTo = [to convertPoint:POINT(2) fromLayer:from];
+                    CGPoint ctrl1 = [to convertPoint:POINT(1) fromLayer:from];
+                    [path addQuadCurveToPoint:curveTo controlPoint:ctrl1];
+                }
+                break;
+            case kCGPathElementAddCurveToPoint:
+                if (points.count == 4)
+                {
+                    CGPoint curveTo = [to convertPoint:POINT(3) fromLayer:from];
+                    CGPoint ctrl1 = [to convertPoint:POINT(1) fromLayer:from];
+                    CGPoint ctrl2 = [to convertPoint:POINT(2) fromLayer:from];
+                    [path addCurveToPoint:curveTo controlPoint1:ctrl1 controlPoint2:ctrl2];
+                }
+                break;
+        }
+    }
+    
+    return path;
 }
 
 
@@ -360,19 +413,19 @@ void getBezierElements(void *info, const CGPathElement *element)
         switch (elementType)
         {
             case kCGPathElementCloseSubpath:
-                [path closePath];
+                [newPath closePath];
                 break;
             case kCGPathElementMoveToPoint:
                 if (points.count == 2)
-                    [path moveToPoint:POINT(1)];
+                    [newPath moveToPoint:POINT(1)];
                 break;
             case kCGPathElementAddLineToPoint:
                 if (points.count == 2)
                 {
-                    CGPoint startPoint = [path currentPoint];
+                    CGPoint startPoint = [newPath currentPoint];
                     CGPoint lineTo =  POINT(1);
                     
-                    float dist = distance([path currentPoint], POINT(1));
+                    float dist = distance([newPath currentPoint], POINT(1));
                     NSInteger steps = MAX(floor(dist / 1), 1);
                     for(NSInteger step = 0; step < steps; step++) {
                         // 0 <= t < 1
@@ -381,13 +434,13 @@ void getBezierElements(void *info, const CGPathElement *element)
                         // calculate the point along the line
                         CGPoint point = CGPointMake(startPoint.x + (lineTo.x - startPoint.x) * t,
                                                     startPoint.y + (lineTo.y - startPoint.y) * t);
-                        [path addLineToPoint:point];
+                        [newPath addLineToPoint:point];
                     }
                 }
                 break;
             case kCGPathElementAddQuadCurveToPoint:
                 if (points.count == 3)
-                    [path addQuadCurveToPoint:POINT(2) controlPoint:POINT(1)];
+                    [newPath addQuadCurveToPoint:POINT(2) controlPoint:POINT(1)];
                 break;
             case kCGPathElementAddCurveToPoint:
                 if (points.count == 4)
@@ -417,12 +470,12 @@ void getBezierElements(void *info, const CGPathElement *element)
                     
                     
                 }
-                    [path addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
+                    [newPath addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
                 break;
         }
     }
     
-    return path;
+    return newPath;
 }
 
 #pragma mark - Helper
