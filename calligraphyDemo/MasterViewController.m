@@ -54,9 +54,9 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         
-        SVGKSourceLocalFile* source = [SVGKSourceLocalFile internalSourceAnywhereInBundleUsingName:self.objects[indexPath.row]];;
+        //SVGKSourceLocalFile* source = [SVGKSourceLocalFile internalSourceAnywhereInBundleUsingName:self.objects[indexPath.row]];;
         DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
-        [controller setDetailItem:source];
+        //[controller setDetailItem:source];
         controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
     }

@@ -33,6 +33,7 @@
 		126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B71CDBBBC200BFD1E2 /* brush5.png */; };
 		126DC1BC1CDF83E700BFD1E2 /* test.svg in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1BB1CDF83E700BFD1E2 /* test.svg */; };
 		126DC1C51CE0D99E00BFD1E2 /* er.svg in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1C41CE0D99E00BFD1E2 /* er.svg */; };
+		72574D3A1CE1D325000AB45F /* SVGDrawingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72574D391CE1D325000AB45F /* SVGDrawingView.m */; };
 		7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */ = {isa = PBXBuildFile; fileRef = 7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */; };
 		7297A5861CD99D13003682A1 /* Erase.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5671CD99D13003682A1 /* Erase.caf */; };
 		7297A5871CD99D13003682A1 /* Blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5691CD99D13003682A1 /* Blue.png */; };
@@ -184,6 +185,8 @@
 		126DC1B71CDBBBC200BFD1E2 /* brush5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush5.png; sourceTree = "<group>"; };
 		126DC1BB1CDF83E700BFD1E2 /* test.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test.svg; sourceTree = "<group>"; };
 		126DC1C41CE0D99E00BFD1E2 /* er.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = er.svg; sourceTree = "<group>"; };
+		72574D381CE1D325000AB45F /* SVGDrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVGDrawingView.h; sourceTree = "<group>"; };
+		72574D391CE1D325000AB45F /* SVGDrawingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVGDrawingView.m; sourceTree = "<group>"; };
 		7277E2A61CCF43AF000D5E35 /* UIBezierPath-Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBezierPath-Points.h"; sourceTree = "<group>"; };
 		7277E2A71CCF43AF000D5E35 /* UIBezierPath-Points.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBezierPath-Points.m"; sourceTree = "<group>"; };
 		7297A5671CD99D13003682A1 /* Erase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Erase.caf; sourceTree = "<group>"; };
@@ -299,6 +302,8 @@
 				122AABEA1CCCA28800677FF1 /* LaunchScreen.storyboard */,
 				122AABED1CCCA28800677FF1 /* Info.plist */,
 				122AABD91CCCA28800677FF1 /* Supporting Files */,
+				72574D381CE1D325000AB45F /* SVGDrawingView.h */,
+				72574D391CE1D325000AB45F /* SVGDrawingView.m */,
 			);
 			path = calligraphyDemo;
 			sourceTree = "<group>";
@@ -675,6 +680,7 @@
 				7297A5991CD99D13003682A1 /* SoundEffect.m in Sources */,
 				7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */,
 				122AABE41CCCA28800677FF1 /* DetailViewController.m in Sources */,
+				72574D3A1CE1D325000AB45F /* SVGDrawingView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

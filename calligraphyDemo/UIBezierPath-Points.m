@@ -160,7 +160,7 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     {
         if (!points.count)
             continue;
-        CGPathElementType elementType = [points[0] integerValue];
+        CGPathElementType elementType = (CGPathElementType)[points[0] integerValue];
         NSUInteger index = [elements indexOfObject:points];
         
         switch (elementType)
@@ -223,10 +223,22 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
         }
     }
     
-    NSLog(@"startIndex:%ld, endIndex:%ld", startIndex, endIndex);
     NSMutableArray *newElements = [NSMutableArray array];
-    NSArray *array = elements[startIndex];
-    [newElements addObject:@[@(kCGPathElementMoveToPoint), array[1]]];
+    NSArray *from = elements[startIndex];
+    NSArray *to = elements[endIndex];
+    
+     NSArray *startPoint = elements[0];
+    CGPoint endPoint = [self currentPoint]; //结束点
+    if (distance([startPoint[1] CGPointValue], [from[1] CGPointValue]) < 10) {
+        startIndex = 0;
+        from = startPoint;
+    }
+    
+    if (distance(endPoint, [to[1] CGPointValue]) < 10) {
+        endIndex = self.bezierElements.count - 1;
+    }
+    
+    [newElements addObject:@[@(kCGPathElementMoveToPoint), from[1]]];
     
     for (NSUInteger i = startIndex+1; i <= endIndex; i++) {
         [newElements addObject:elements[i]];
@@ -398,6 +410,44 @@ void getBezierElements(void *info, const CGPathElement *element)
     }
     
     return path;
+}
+
+- (UIBezierPath *) combineWithPath: (UIBezierPath *) path
+{
+    UIBezierPath *newPath = [UIBezierPath bezierPathWithCGPath:self.CGPath];
+    NSArray *elements = [path bezierElements];
+    
+    if (elements.count == 0) return path;
+    
+    for (NSArray *points in elements)
+    {
+        if (!points.count) continue;
+        CGPathElementType elementType = [points[0] integerValue];
+        switch (elementType)
+        {
+            case kCGPathElementCloseSubpath:
+                //[path closePath];
+                break;
+            case kCGPathElementMoveToPoint:
+                if (points.count == 2)
+                    //[path moveToPoint:POINT(1)];
+                break;
+            case kCGPathElementAddLineToPoint:
+                if (points.count == 2)
+                    [newPath addLineToPoint:POINT(1)];
+                break;
+            case kCGPathElementAddQuadCurveToPoint:
+                if (points.count == 3)
+                    [newPath addQuadCurveToPoint:POINT(2) controlPoint:POINT(1)];
+                break;
+            case kCGPathElementAddCurveToPoint:
+                if (points.count == 4)
+                    [newPath addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
+                break;
+        }
+    }
+    
+    return newPath;
 }
 
 + (UIBezierPath *) pathWithPath: (UIBezierPath *) path

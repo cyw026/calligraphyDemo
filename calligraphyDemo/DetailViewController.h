@@ -10,6 +10,7 @@
 #import "SVGKit.h"
 #import "SVGKImage.h"
 #import <QuartzCore/CALayer.h>
+#import "SVGDrawingView.h"
 
 #define kDrawingPathKey @"drawingPath"
 

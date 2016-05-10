@@ -25,4 +25,5 @@
 + (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count;
 - (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end;
 - (UIBezierPath *)covertPathFromLayer:(CALayer *)from toLayer:(CALayer*)to;
+- (UIBezierPath *)combineWithPath: (UIBezierPath *) path;
 @end
