@@ -122,54 +122,9 @@
     UITouch *touch = touches.anyObject;
     CGPoint p = [touch locationInView:self];
     
-    NSValue *vp = [NSValue valueWithCGPoint:p];
-    
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
-        SVGKImage *image = layerForHitTesting.SVGImage;
-        
-        Element* elementsUsingTagG = [image.DOMDocument getElementById:@"path4516"];
-        NSLog( @"checking for SVG standard set of elements with XML tag/node of <g>: %@", elementsUsingTagG );
-        
-        SVGGElement *parentNode = (SVGGElement*)elementsUsingTagG.parentNode;
-        
-        NSLog(@"hitLayer.DOMTree:%@", image.DOMTree);
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
     
-        //SVGKImage *hitLayerImage = hitLayer.SVGImage;
-        //NSLog(@"hitLayerImage:%@", hitLayerImage.DOMTree);
-        
-#if 0
-        CALayerWithChildHitTest *mask = (CALayerWithChildHitTest *)hitLayer.mask;
-        CAShapeLayerWithHitTest *clipPathLayer = (CAShapeLayerWithHitTest *)[[mask sublayers] firstObject];
-        UIBezierPath *clipPath = [UIBezierPath bezierPath];
-        clipPath.CGPath = clipPathLayer.path;
-        
-        for (int i = (int)clipPath.points.count - 1; i > 0; i--) {
-            
-            NSValue *pointV = clipPath.points[i];
-            CGPoint Point = [self.view.layer convertPoint:[pointV CGPointValue] fromLayer:hitLayer];
-            
-            UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:Point radius:8 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-            CAShapeLayer* clipLayer = [CAShapeLayer layer];
-            clipLayer.path = pointPath.CGPath;
-            clipLayer.fillColor = [UIColor blackColor].CGColor;
-            clipLayer.strokeColor = [UIColor redColor].CGColor;
-            [self.view.layer addSublayer:clipLayer];
-            
-            CATextLayer *textLayer = [CATextLayer layer];
-            textLayer.string = [NSString stringWithFormat:@"%d", i];
-            textLayer.font = (__bridge CFTypeRef _Nullable)(@"HiraKakuProN-W3");
-            textLayer.fontSize = 10.f;
-            textLayer.alignmentMode = kCAAlignmentCenter;//字体的对齐方式
-            textLayer.position = Point;
-            textLayer.foregroundColor = [UIColor greenColor].CGColor;//字体的颜色
-            textLayer.bounds = CGRectMake(0, 0, 10, 10);
-            [clipLayer addSublayer:textLayer];
-        }
-#endif
-        
-        
-        
         if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
             // 判断当前选中的是否为笔画的形状图层
             //hitLayer.strokeColor = [UIColor blackColor].CGColor;
@@ -180,10 +135,7 @@
             else {
                 [self deselectTappedLayer];
             }
-            
             lastTappedLayer = hitLayer;
-            lastTappedLayer.delegate = self;
-            
             //
             if (!bSubdivide) {
                 CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:hitLayer.superlayer];
@@ -229,27 +181,28 @@
     CGPoint p = [touch locationInView:self];
     CGPoint prevPoint = [touch previousLocationInView:self];
     
-    NSValue *vp = [NSValue valueWithCGPoint:p];
+    //NSValue *vp = [NSValue valueWithCGPoint:p];
     
-    
+    if (!lastTappedLayer) {
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
-        
         CALayer* hitLayer = [layerForHitTesting hitTest:p];
-    
         if ([hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
+            lastTappedLayer = (CAShapeLayerWithHitTest*)hitLayer;
+        }
+    }
+        
+        if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
             
-            CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:hitLayer.superlayer];
-            CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:hitLayer.superlayer];
-            CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:hitLayer.superlayer];
+            CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
+            CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:lastTappedLayer.superlayer];
+            CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:lastTappedLayer.superlayer];
             
             UIBezierPath *bezierPath_m = [UIBezierPath bezierPathWithCGPath:layer_m.path];
             UIBezierPath *bezierPath_l = [UIBezierPath bezierPathWithCGPath:layer_l.path];;
             UIBezierPath *bezierPath_r = [UIBezierPath bezierPathWithCGPath:layer_r.path];;
             
             CGPathRef path_m = bezierPath_m.CGPath;
-            
-            lastTappedLayer = (CAShapeLayerWithHitTest*)hitLayer;
             
             CGPoint prevTouch = [layer_m convertPoint:prevPoint fromLayer:self.layer];
             CGPoint touchPoint = [layer_m convertPoint:p fromLayer:self.layer];
@@ -287,7 +240,7 @@
                 movingPath = [movingPath combineWithPath:rightPath];
             }
             
-            NSArray *startPoint = leftPath.bezierElements[0];
+            //NSArray *startPoint = leftPath.bezierElements[0];
             //[movingPath addLineToPoint:[startPoint[1] CGPointValue]];
             
             [movingPath closePath];
@@ -300,10 +253,47 @@
             //CGPathCloseSubpath(newPath);
             [drawingPath appendPath:[UIBezierPath bezierPathWithCGPath:newPath]];
             
-            NSLog(@"drawingPath:%@", movingPath);
+            //NSLog(@"drawingPath:%@", movingPath);
             
             //lastTappedLayer.delegate = self;
             //[lastTappedLayer setNeedsDisplay];
+            
+            CGRect bounds = self.bounds;
+            
+            UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0.0);
+            
+            CGPathRef clipPathRef = CGPathCreateCopy(lastTappedLayer.path);
+            UIBezierPath *clipPath = [UIBezierPath bezierPathWithCGPath:clipPathRef];
+            
+            clipPath  = [clipPath covertPathFromLayer:lastTappedLayer toLayer:self.layer];
+            
+            
+            
+            if (!incrementalImage)
+            {
+                UIBezierPath *rectpath = [UIBezierPath bezierPathWithRect:self.bounds];
+                [[UIColor whiteColor] setFill];
+                [rectpath fill];
+            }
+            [incrementalImage drawAtPoint:CGPointZero];
+            
+            
+            
+            [[UIColor blackColor] setStroke];
+            [[UIColor blackColor] setFill];
+            
+            [clipPath addClip];
+            
+            [drawingPath stroke]; // ................. (8)
+            [drawingPath fill];
+            
+            
+            
+            incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            [drawingPath removeAllPoints];
+            [self setNeedsDisplay];
+            
         } else {
             NSLog(@"outOfBoundingBox");
             //            [movingPath closePath];
@@ -315,45 +305,7 @@
             //
             [movingPath removeAllPoints];
         }
-    
-    UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-    
-    CGRect bounds = self.bounds;
-    
-    UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0.0);
-    
-    CGPathRef clipPathRef = CGPathCreateCopy(lastTappedLayer.path);
-    UIBezierPath *clipPath = [UIBezierPath bezierPathWithCGPath:clipPathRef];
-    
-    clipPath  = [clipPath covertPathFromLayer:lastTappedLayer toLayer:self.layer];
-    
-    
-    
-    if (!incrementalImage)
-    {
-        UIBezierPath *rectpath = [UIBezierPath bezierPathWithRect:self.bounds];
-        [[UIColor whiteColor] setFill];
-        [rectpath fill];
-    }
-    [incrementalImage drawAtPoint:CGPointZero];
-    
-    
-    
-    [[UIColor blackColor] setStroke];
-    [[UIColor blackColor] setFill];
-    
-    [clipPath addClip];
-    
-    [drawingPath stroke]; // ................. (8)
-    [drawingPath fill];
-    
-    
-    
-    incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    [drawingPath removeAllPoints];
-    [self setNeedsDisplay];
-}
+ }
 
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
