@@ -13,7 +13,6 @@
     CAShapeLayer* lastTappedLayer;
     CGFloat lastTappedLayerOriginalBorderWidth;
     CGColorRef lastTappedLayerOriginalBorderColor;
-    BOOL bSubdivide;
     
     UIBezierPath *movingPath;
     UIImage *incrementalImage;
@@ -31,7 +30,6 @@
     
     if (self = [super initWithSVGKImage:svgImage]) {
         self.showBorder = FALSE;
-        bSubdivide =  NO;
         movingPath = [UIBezierPath bezierPath];
     }
     return self;
@@ -135,23 +133,8 @@
             else {
                 [self deselectTappedLayer];
             }
-            lastTappedLayer = hitLayer;
+            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_TOP superlayer:hitLayer.superlayer];
             //
-//            if (!bSubdivide) {
-//                CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:hitLayer.superlayer];
-//                CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:hitLayer.superlayer];
-//                CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:hitLayer.superlayer];
-//                
-//                UIBezierPath *bezierPath_m = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_m.path]];
-//                UIBezierPath *bezierPath_l = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_l.path]];
-//                UIBezierPath *bezierPath_r = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_r.path]];
-//                
-//                layer_m.path = bezierPath_m.CGPath;
-//                layer_l.path = bezierPath_l.CGPath;
-//                layer_r.path = bezierPath_r.CGPath;
-//                
-//                bSubdivide = YES;
-//            }
             
             
             UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
@@ -188,12 +171,14 @@
         CALayer* hitLayer = [layerForHitTesting hitTest:p];
         NSLog(@"[hitLayer class]:%@", NSStringFromClass([hitLayer class]));
         if ([hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
-            lastTappedLayer = (CAShapeLayerWithHitTest*)hitLayer;
+            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_TOP superlayer:hitLayer.superlayer];
         }
     }
         
         if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
+            
+            
             
             CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
             CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:lastTappedLayer.superlayer];
@@ -202,6 +187,22 @@
             UIBezierPath *bezierPath_m = [UIBezierPath bezierPathWithCGPath:layer_m.path];
             UIBezierPath *bezierPath_l = [UIBezierPath bezierPathWithCGPath:layer_l.path];;
             UIBezierPath *bezierPath_r = [UIBezierPath bezierPathWithCGPath:layer_r.path];;
+            
+            BOOL bSubdivide = [lastTappedLayer valueForKey:kSubdivideFlagKey];
+            
+            if (!bSubdivide) {
+                
+                bezierPath_m = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_m.path]];
+                bezierPath_l = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_l.path]];
+                bezierPath_r = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_r.path]];
+                
+                layer_m.path = bezierPath_m.CGPath;
+                layer_l.path = bezierPath_l.CGPath;
+                layer_r.path = bezierPath_r.CGPath;
+                
+                [lastTappedLayer setValue:@(1) forKey:kSubdivideFlagKey];
+            }
+            
             
             CGPathRef path_m = bezierPath_m.CGPath;
             
@@ -285,28 +286,39 @@
             [[UIColor blackColor] setStroke];
             [[UIColor blackColor] setFill];
             
-            //[clipPath addClip];
             
-            for (NSValue *v in rightPath.points) {
-                CGPoint point = [v CGPointValue];
-                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-                [[UIColor redColor] set];
-                [pointPath stroke];
-            }
+//            [clipPath fill];
+//            
+//            for (NSValue *v in clipPath.points) {
+//                CGPoint point = [v CGPointValue];
+//                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:1 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+//                [[UIColor blueColor] set];
+//                [pointPath stroke];
+//                [pointPath fill];
+//            }
             
-            for (NSValue *v in leftPath.points) {
-                CGPoint point = [v CGPointValue];
-                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-                [[UIColor greenColor] set];
-                //[pointPath stroke];
-            }
+            [clipPath addClip];
             
-            for (NSValue *v in bezierPath_m.points) {
-                CGPoint point = [v CGPointValue];
-                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:1 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
-                [[UIColor redColor] set];
-                [pointPath stroke];
-            }
+//            for (NSValue *v in rightPath.points) {
+//                CGPoint point = [v CGPointValue];
+//                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+//                [[UIColor redColor] set];
+//                [pointPath stroke];
+//            }
+//            
+//            for (NSValue *v in leftPath.points) {
+//                CGPoint point = [v CGPointValue];
+//                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+//                [[UIColor greenColor] set];
+//                [pointPath stroke];
+//            }
+            
+//            for (NSValue *v in bezierPath_m.points) {
+//                CGPoint point = [v CGPointValue];
+//                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:1 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+//                [[UIColor redColor] set];
+//                [pointPath stroke];
+//            }
             
             [[UIColor blackColor] set];
             [movingPath stroke]; // ................. (8)

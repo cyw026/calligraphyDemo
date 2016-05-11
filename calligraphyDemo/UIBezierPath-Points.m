@@ -224,22 +224,37 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     }
     
     NSMutableArray *newElements = [NSMutableArray array];
-    NSArray *from = elements[startIndex];
     
-     NSArray *startPoint = elements[0];
      // 距离起始点小于3，则将起始点作为路径起点
-    if (startIndex < 5) {
+    NSArray *from = elements[startIndex];
+    NSArray *to = elements[endIndex];
+    
+    NSArray *startPoint = elements[0];
+    CGPoint endPoint = [self currentPoint]; //结束点
+    if (distance([startPoint[1] CGPointValue], [from[1] CGPointValue]) < 10) {
         startIndex = 0;
         from = startPoint;
-    } else {
-        NSInteger interval = self.bezierElements.count - endIndex;
-        
-        if (interval < 5) {
-            endIndex = self.bezierElements.count - 1;
-        }
+    }
+    
+    if (distance(endPoint, [to[1] CGPointValue]) < 10) {
+        endIndex = self.bezierElements.count - 1;
     }
     
     [newElements addObject:@[@(kCGPathElementMoveToPoint), from[1]]];
+
+    
+//    if (startIndex < 5) {
+//        startIndex = 0;
+//        from = startPoint;
+//    } else {
+//        NSInteger interval = self.bezierElements.count - endIndex;
+//        
+//        if (interval < 5) {
+//            endIndex = self.bezierElements.count - 1;
+//        }
+//    }
+//    
+//    [newElements addObject:@[@(kCGPathElementMoveToPoint), from[1]]];
     
     for (NSUInteger i = startIndex+1; i <= endIndex; i++) {
         [newElements addObject:elements[i]];
@@ -431,7 +446,13 @@ void getBezierElements(void *info, const CGPathElement *element)
                 break;
             case kCGPathElementMoveToPoint:
                 if (points.count == 2)
-                    [path addLineToPoint:POINT(1)];
+                {
+                    if (CGPathIsEmpty(self.CGPath)) {
+                        [newPath moveToPoint:POINT(1)];
+                    } else {
+                        [newPath addLineToPoint:POINT(1)];
+                    }
+                }
                 break;
             case kCGPathElementAddLineToPoint:
                 if (points.count == 2)
@@ -477,15 +498,22 @@ void getBezierElements(void *info, const CGPathElement *element)
                     CGPoint lineTo =  POINT(1);
                     
                     float dist = distance([newPath currentPoint], POINT(1));
-                    NSInteger steps = MAX(floor(dist / 1), 1);
-                    for(NSInteger step = 0; step < steps; step++) {
-                        // 0 <= t < 1
-                        CGFloat t = (CGFloat)step / (CGFloat)steps;
+                    NSInteger steps = MAX(floor(dist / 5), 1);
+                    
+                    if (steps < 2) {
+                        [newPath addLineToPoint:lineTo];
+                    } else {
                         
-                        // calculate the point along the line
-                        CGPoint point = CGPointMake(startPoint.x + (lineTo.x - startPoint.x) * t,
-                                                    startPoint.y + (lineTo.y - startPoint.y) * t);
-                        [newPath addLineToPoint:point];
+                        for(NSInteger step = 0; step < steps; step++) {
+                            // 0 <= t < 1
+                            CGFloat t = (CGFloat)step / (CGFloat)steps;
+                            
+                            // calculate the point along the line
+                            CGPoint point = CGPointMake(startPoint.x + (lineTo.x - startPoint.x) * t,
+                                                        startPoint.y + (lineTo.y - startPoint.y) * t);
+                            [newPath addLineToPoint:point];
+                        }
+                        [newPath addLineToPoint:lineTo];
                     }
                 }
                 break;
@@ -518,10 +546,9 @@ void getBezierElements(void *info, const CGPathElement *element)
 //                        CGPoint point = rightBez[0];
 //                        [path addLineToPoint:point];
 //                    }
-                    
-                    
-                }
                     [newPath addCurveToPoint:POINT(3) controlPoint1:POINT(1) controlPoint2:POINT(2)];
+                }
+                
                 break;
         }
     }

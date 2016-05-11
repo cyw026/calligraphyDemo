@@ -12,6 +12,7 @@
 #import "UIBezierPath-Points.h"
 
 #define kDrawingPathKey @"drawingPath"
+#define kSubdivideFlagKey @"subdivideFlag"
 
 typedef enum : NSUInteger {
     PATHLAYER_INDEX_LEFT,
