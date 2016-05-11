@@ -245,7 +245,7 @@
             
             //NSArray *startPoint = leftPath.bezierElements[0];
             //[movingPath addLineToPoint:[startPoint[1] CGPointValue]];
-            CGPathContainsPoint(<#CGPathRef  _Nullable path#>, <#const CGAffineTransform * _Nullable m#>, <#CGPoint point#>, <#bool eoFill#>)
+            
             [movingPath closePath];
             
             //UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
@@ -291,7 +291,7 @@
                 CGPoint point = [v CGPointValue];
                 UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
                 [[UIColor redColor] set];
-                //[pointPath stroke];
+                [pointPath stroke];
             }
             
             for (NSValue *v in leftPath.points) {

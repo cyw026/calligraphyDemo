@@ -234,7 +234,7 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     } else {
         NSInteger interval = self.bezierElements.count - endIndex;
         
-        if (interval < 10) {
+        if (interval < 5) {
             endIndex = self.bezierElements.count - 1;
         }
     }
