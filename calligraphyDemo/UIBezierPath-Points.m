@@ -498,7 +498,7 @@ void getBezierElements(void *info, const CGPathElement *element)
                     CGPoint lineTo =  POINT(1);
                     
                     float dist = distance([newPath currentPoint], POINT(1));
-                    NSInteger steps = MAX(floor(dist / 5), 1);
+                    NSInteger steps = MAX(floor(dist / 2), 1);
                     
                     if (steps < 2) {
                         [newPath addLineToPoint:lineTo];
