@@ -26,11 +26,11 @@
             return TRUE;
         }
     }
-	if( boundsContains )
+	//if( boundsContains )
 	{
-        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(self.path, nil, 30, kCGLineCapRound, kCGLineJoinRound, 30);
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(self.path, nil, 10, kCGLineCapRound, kCGLineJoinRound, 30);
 
-        BOOL pathContains = CGPathContainsPoint(strokingPath, NULL, p, false);
+        BOOL pathContains = CGPathContainsPoint(self.path, NULL, p, false);
 		
 		if( pathContains )
 		{

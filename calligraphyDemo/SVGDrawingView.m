@@ -137,21 +137,21 @@
             }
             lastTappedLayer = hitLayer;
             //
-            if (!bSubdivide) {
-                CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:hitLayer.superlayer];
-                CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:hitLayer.superlayer];
-                CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:hitLayer.superlayer];
-                
-                UIBezierPath *bezierPath_m = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_m.path]];
-                UIBezierPath *bezierPath_l = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_l.path]];
-                UIBezierPath *bezierPath_r = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_r.path]];
-                
-                layer_m.path = bezierPath_m.CGPath;
-                layer_l.path = bezierPath_l.CGPath;
-                layer_r.path = bezierPath_r.CGPath;
-                
-                bSubdivide = YES;
-            }
+//            if (!bSubdivide) {
+//                CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:hitLayer.superlayer];
+//                CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:hitLayer.superlayer];
+//                CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:hitLayer.superlayer];
+//                
+//                UIBezierPath *bezierPath_m = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_m.path]];
+//                UIBezierPath *bezierPath_l = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_l.path]];
+//                UIBezierPath *bezierPath_r = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_r.path]];
+//                
+//                layer_m.path = bezierPath_m.CGPath;
+//                layer_l.path = bezierPath_l.CGPath;
+//                layer_r.path = bezierPath_r.CGPath;
+//                
+//                bSubdivide = YES;
+//            }
             
             
             UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
@@ -186,6 +186,7 @@
     if (!lastTappedLayer) {
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
         CALayer* hitLayer = [layerForHitTesting hitTest:p];
+        NSLog(@"[hitLayer class]:%@", NSStringFromClass([hitLayer class]));
         if ([hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
             lastTappedLayer = (CAShapeLayerWithHitTest*)hitLayer;
         }
@@ -233,6 +234,8 @@
             leftPath  = [leftPath covertPathFromLayer:layer_l toLayer:self.layer];
             rightPath = [rightPath covertPathFromLayer:layer_r toLayer:self.layer];
             
+            bezierPath_m = [bezierPath_m covertPathFromLayer:layer_m toLayer:self.layer];
+            
             if (CGPathIsEmpty(movingPath.CGPath)) {
                 movingPath  = [leftPath combineWithPath:rightPath];
             } else {
@@ -242,18 +245,18 @@
             
             //NSArray *startPoint = leftPath.bezierElements[0];
             //[movingPath addLineToPoint:[startPoint[1] CGPointValue]];
-            
+            CGPathContainsPoint(<#CGPathRef  _Nullable path#>, <#const CGAffineTransform * _Nullable m#>, <#CGPoint point#>, <#bool eoFill#>)
             [movingPath closePath];
             
-            UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-            CGMutablePathRef newPath = CGPathCreateMutable();
+            //UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
+            //CGMutablePathRef newPath = CGPathCreateMutable();
             
-            CGPathAddPath(newPath, NULL, movingPath.CGPath);
+            //CGPathAddPath(newPath, NULL, movingPath.CGPath);
             //CGPathAddPath(newPath, NULL, rightPath.CGPath);
             //CGPathCloseSubpath(newPath);
-            [drawingPath appendPath:[UIBezierPath bezierPathWithCGPath:newPath]];
+            //[drawingPath appendPath:[UIBezierPath bezierPathWithCGPath:newPath]];
             
-            //NSLog(@"drawingPath:%@", movingPath);
+            NSLog(@"drawingPath:%@", movingPath);
             
             //lastTappedLayer.delegate = self;
             //[lastTappedLayer setNeedsDisplay];
@@ -282,16 +285,38 @@
             [[UIColor blackColor] setStroke];
             [[UIColor blackColor] setFill];
             
-            [clipPath addClip];
+            //[clipPath addClip];
             
-            [drawingPath stroke]; // ................. (8)
-            [drawingPath fill];
+            for (NSValue *v in rightPath.points) {
+                CGPoint point = [v CGPointValue];
+                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+                [[UIColor redColor] set];
+                //[pointPath stroke];
+            }
+            
+            for (NSValue *v in leftPath.points) {
+                CGPoint point = [v CGPointValue];
+                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:2 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+                [[UIColor greenColor] set];
+                //[pointPath stroke];
+            }
+            
+            for (NSValue *v in bezierPath_m.points) {
+                CGPoint point = [v CGPointValue];
+                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:1 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
+                [[UIColor redColor] set];
+                [pointPath stroke];
+            }
+            
+            [[UIColor blackColor] set];
+            [movingPath stroke]; // ................. (8)
+            [movingPath fill];
             
             
             
             incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
-            [drawingPath removeAllPoints];
+            //[movingPath removeAllPoints];
             [self setNeedsDisplay];
             
         } else {
@@ -313,7 +338,7 @@
     //    UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
     //    [movingPath closePath];
     //    [drawingPath appendPath:movingPath];
-//    [movingPath removeAllPoints];
+    [movingPath removeAllPoints];
 //    lastTappedLayer.delegate = self;
 //    [lastTappedLayer setNeedsDisplay];
     

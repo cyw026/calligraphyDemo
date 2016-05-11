@@ -166,11 +166,11 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
         switch (elementType)
         {
             case kCGPathElementCloseSubpath:
-                [path closePath];
+                //[path closePath];
                 break;
             case kCGPathElementMoveToPoint:
                 if (points.count == 2)
-                    [path moveToPoint:POINT(1)];
+                    //[path moveToPoint:POINT(1)];
                 break;
             case kCGPathElementAddLineToPoint:
                 if (points.count == 2)
@@ -225,17 +225,18 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
     
     NSMutableArray *newElements = [NSMutableArray array];
     NSArray *from = elements[startIndex];
-    NSArray *to = elements[endIndex];
     
      NSArray *startPoint = elements[0];
-    CGPoint endPoint = [self currentPoint]; //结束点
-    if (distance([startPoint[1] CGPointValue], [from[1] CGPointValue]) < 10) {
+     // 距离起始点小于3，则将起始点作为路径起点
+    if (startIndex < 5) {
         startIndex = 0;
         from = startPoint;
-    }
-    
-    if (distance(endPoint, [to[1] CGPointValue]) < 10) {
-        endIndex = self.bezierElements.count - 1;
+    } else {
+        NSInteger interval = self.bezierElements.count - endIndex;
+        
+        if (interval < 10) {
+            endIndex = self.bezierElements.count - 1;
+        }
     }
     
     [newElements addObject:@[@(kCGPathElementMoveToPoint), from[1]]];
@@ -430,7 +431,7 @@ void getBezierElements(void *info, const CGPathElement *element)
                 break;
             case kCGPathElementMoveToPoint:
                 if (points.count == 2)
-                    //[path moveToPoint:POINT(1)];
+                    [path addLineToPoint:POINT(1)];
                 break;
             case kCGPathElementAddLineToPoint:
                 if (points.count == 2)
