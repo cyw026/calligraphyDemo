@@ -20,7 +20,8 @@ static float distance (CGPoint p1, CGPoint p2)
 }
 
 @implementation UIBezierPath (Points)
-void getPointsFromBezier(void *info, const CGPathElement *element)
+
+void pointsFromBezier(void *info, const CGPathElement *element)
 {
     NSMutableArray *bezierPoints = (__bridge NSMutableArray *)info;
     CGPathElementType type = element->type;
@@ -40,7 +41,7 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
 - (NSArray *)points
 {
     NSMutableArray *points = [NSMutableArray array];
-    CGPathApply(self.CGPath, (__bridge void *)points, getPointsFromBezier);
+    CGPathApply(self.CGPath, (__bridge void *)points, pointsFromBezier);
     return points;
 }
 
@@ -91,7 +92,7 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
 + (NSArray *) pointsAdjacent: (CGPathRef) path withPoint:(CGPoint)point
 {
     NSMutableArray *points = [NSMutableArray array];
-    CGPathApply(path, (__bridge void *)points, getPointsFromBezier);
+    CGPathApply(path, (__bridge void *)points, pointsFromBezier);
     
     NSUInteger pointCount = points.count;
     NSUInteger nearestIndex = 0;
@@ -125,7 +126,7 @@ void getPointsFromBezier(void *info, const CGPathElement *element)
 + (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point index:(NSUInteger *)index
 {
     NSMutableArray *points = [NSMutableArray array];
-    CGPathApply(path, (__bridge void *)points, getPointsFromBezier);
+    CGPathApply(path, (__bridge void *)points, pointsFromBezier);
     
     NSUInteger pointCount = points.count;
     CGPoint nearestPoint = POINT(0);
@@ -602,72 +603,7 @@ static inline void subdivideBezier(const CGPoint bez[4], CGPoint bez1[4], CGPoin
 static inline CGFloat distanceBetween(CGPoint a, CGPoint b){
     return hypotf( a.x - b.x, a.y - b.y );
 }
-/**
- * estimates the length along the curve of the
- * input bezier within the input acceptableError
- */
-CGFloat lengthOfBezier(const  CGPoint bez[4], CGFloat acceptableError){
-    CGFloat   polyLen = 0.0;
-    CGFloat   chordLen = distanceBetween (bez[0], bez[3]);
-    CGFloat   retLen, errLen;
-    NSUInteger n;
-    
-    for (n = 0; n < 3; ++n)
-        polyLen += distanceBetween (bez[n], bez[n + 1]);
-    
-    errLen = polyLen - chordLen;
-    
-    if (errLen > acceptableError) {
-        CGPoint left[4], right[4];
-        subdivideBezier (bez, left, right);
-        retLen = (lengthOfBezier (left, acceptableError)
-                  + lengthOfBezier (right, acceptableError));
-    } else {
-        retLen = 0.5 * (polyLen + chordLen);
-    }
-    
-    return retLen;
-}
 
-/**
- * will split the input bezier curve at the input length
- * within a given margin of error
- *
- * the two curves will exactly match the original curve
- */
-static CGFloat subdivideBezierAtLength (const CGPoint bez[4],
-                                        CGPoint bez1[4],
-                                        CGPoint bez2[4],
-                                        CGFloat length,
-                                        CGFloat acceptableError){
-    CGFloat top = 1.0, bottom = 0.0;
-    CGFloat t, prevT;
-    
-    prevT = t = 0.5;
-    for (;;) {
-        CGFloat len1;
-        
-        subdivideBezierAtT (bez, bez1, bez2, t);
-        
-        len1 = lengthOfBezier (bez1, 0.5 * acceptableError);
-        
-        if (fabs (length - len1) < acceptableError)
-            return len1;
-        
-        if (length > len1) {
-            bottom = t;
-            t = 0.5 * (t + top);
-        } else if (length < len1) {
-            top = t;
-            t = 0.5 * (bottom + t);
-        }
-        
-        if (t == prevT)
-            return len1;
-        
-        prevT = t;
-    }
-}
 
 /**
  *  分解贝塞尔曲线

@@ -20,7 +20,5 @@
 
 @property (nonatomic, strong) SVGKImageView *contentView;
 
-- (void)loadSVGFrom:(SVGKSource *) svgSource;
-
 @end
 

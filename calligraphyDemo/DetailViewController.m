@@ -10,6 +10,8 @@
 #import "UIBezierPath-Points.h"
 #import "PaintingViewController.h"
 #import "SVGDrawingView.h"
+#include "CanvasView.h"
+#import "AdonitViewController.h"
 
 @interface DetailViewController () 
 
@@ -68,13 +70,14 @@
 
 - (void)handleRightBarButton:(UIButton *)button
 {
-    PaintingViewController *vc = [[PaintingViewController alloc] initWithNibName:@"PaintingViewController" bundle:nil];
+    AdonitViewController *vc = [[AdonitViewController alloc] initWithNibName:@"AdonitViewController" bundle:nil];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
     vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:nav animated:YES completion:^{
         
     }];
+    //[self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)dealloc

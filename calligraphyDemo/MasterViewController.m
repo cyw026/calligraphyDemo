@@ -8,6 +8,7 @@
 
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "AdonitViewController.h"
 
 @interface MasterViewController ()
 
@@ -93,5 +94,12 @@
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
     }
 }
+
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    AdonitViewController *vc = [[AdonitViewController alloc] initWithNibName:@"AdonitViewController" bundle:nil];
+//
+//    [self.navigationController pushViewController:vc animated:YES];
+//}
 
 @end

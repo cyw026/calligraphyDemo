@@ -31,6 +31,9 @@
     if (self = [super initWithSVGKImage:svgImage]) {
         self.showBorder = FALSE;
         movingPath = [UIBezierPath bezierPath];
+        
+        UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
+        self.backgroundColor = [UIColor colorWithPatternImage:image];
     }
     return self;
 }
@@ -276,7 +279,7 @@
             if (!incrementalImage)
             {
                 UIBezierPath *rectpath = [UIBezierPath bezierPathWithRect:self.bounds];
-                [[UIColor whiteColor] setFill];
+                [[UIColor colorWithPatternImage:[UIImage imageNamed:@"paintingView_BG"]] setFill];
                 [rectpath fill];
             }
             [incrementalImage drawAtPoint:CGPointZero];

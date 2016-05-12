@@ -66,6 +66,23 @@
 		72BA1A441CCE0629006849E3 /* drawing.svg in Resources */ = {isa = PBXBuildFile; fileRef = 72BA1A431CCE0629006849E3 /* drawing.svg */; };
 		72BA1A4B1CCE0712006849E3 /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; };
 		72BA1A4C1CCE0712006849E3 /* CocoaLumberjack.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72C6E7B61CE427FC001281E9 /* AdonitSDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 72C6E7981CE427FC001281E9 /* AdonitSDK.bundle */; };
+		72C6E7B71CE427FC001281E9 /* AdonitSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72C6E7991CE427FC001281E9 /* AdonitSDK.framework */; };
+		72C6E7B81CE427FC001281E9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E79B1CE427FC001281E9 /* CanvasView.m */; };
+		72C6E7BA1CE427FC001281E9 /* Brush.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E79F1CE427FC001281E9 /* Brush.m */; };
+		72C6E7BB1CE427FC001281E9 /* AbstractBezierPathElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7A21CE427FC001281E9 /* AbstractBezierPathElement.m */; };
+		72C6E7BC1CE427FC001281E9 /* CurveToPathElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7A41CE427FC001281E9 /* CurveToPathElement.m */; };
+		72C6E7BD1CE427FC001281E9 /* LineToPathElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7A61CE427FC001281E9 /* LineToPathElement.m */; };
+		72C6E7BE1CE427FC001281E9 /* MoveToPathElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7A81CE427FC001281E9 /* MoveToPathElement.m */; };
+		72C6E7BF1CE427FC001281E9 /* SegmentSmoother.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7AA1CE427FC001281E9 /* SegmentSmoother.m */; };
+		72C6E7C01CE427FC001281E9 /* SmoothStroke.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7AC1CE427FC001281E9 /* SmoothStroke.m */; };
+		72C6E7C11CE427FC001281E9 /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7AE1CE427FC001281E9 /* Helper.m */; };
+		72C6E7C41CE427FC001281E9 /* UIColor+Components.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7B21CE427FC001281E9 /* UIColor+Components.m */; };
+		72C6E7C51CE427FC001281E9 /* UIEvent+iOS8.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7B41CE427FC001281E9 /* UIEvent+iOS8.m */; };
+		72C6E7CE1CE42BCF001281E9 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = 72C6E7CC1CE42BCF001281E9 /* brush.png */; };
+		72C6E7CF1CE42BCF001281E9 /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = 72C6E7CD1CE42BCF001281E9 /* brush1.png */; };
+		72C6E7DC1CE45174001281E9 /* AdonitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C6E7DA1CE45174001281E9 /* AdonitViewController.m */; };
+		72C6E7DD1CE45174001281E9 /* AdonitViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72C6E7DB1CE45174001281E9 /* AdonitViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -226,6 +243,37 @@
 		72A396751CDB2D1200D40D37 /* brush3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush3.png; sourceTree = "<group>"; };
 		72BA1A431CCE0629006849E3 /* drawing.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = drawing.svg; sourceTree = "<group>"; };
 		72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = "3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS/CocoaLumberjack.framework"; sourceTree = "<group>"; };
+		72C6E7981CE427FC001281E9 /* AdonitSDK.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AdonitSDK.bundle; sourceTree = "<group>"; };
+		72C6E7991CE427FC001281E9 /* AdonitSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AdonitSDK.framework; sourceTree = "<group>"; };
+		72C6E79A1CE427FC001281E9 /* CanvasView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanvasView.h; sourceTree = "<group>"; };
+		72C6E79B1CE427FC001281E9 /* CanvasView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CanvasView.m; sourceTree = "<group>"; };
+		72C6E79E1CE427FC001281E9 /* Brush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Brush.h; sourceTree = "<group>"; };
+		72C6E79F1CE427FC001281E9 /* Brush.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Brush.m; sourceTree = "<group>"; };
+		72C6E7A11CE427FC001281E9 /* AbstractBezierPathElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractBezierPathElement.h; sourceTree = "<group>"; };
+		72C6E7A21CE427FC001281E9 /* AbstractBezierPathElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AbstractBezierPathElement.m; sourceTree = "<group>"; };
+		72C6E7A31CE427FC001281E9 /* CurveToPathElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurveToPathElement.h; sourceTree = "<group>"; };
+		72C6E7A41CE427FC001281E9 /* CurveToPathElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurveToPathElement.m; sourceTree = "<group>"; };
+		72C6E7A51CE427FC001281E9 /* LineToPathElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineToPathElement.h; sourceTree = "<group>"; };
+		72C6E7A61CE427FC001281E9 /* LineToPathElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineToPathElement.m; sourceTree = "<group>"; };
+		72C6E7A71CE427FC001281E9 /* MoveToPathElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoveToPathElement.h; sourceTree = "<group>"; };
+		72C6E7A81CE427FC001281E9 /* MoveToPathElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoveToPathElement.m; sourceTree = "<group>"; };
+		72C6E7A91CE427FC001281E9 /* SegmentSmoother.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SegmentSmoother.h; sourceTree = "<group>"; };
+		72C6E7AA1CE427FC001281E9 /* SegmentSmoother.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SegmentSmoother.m; sourceTree = "<group>"; };
+		72C6E7AB1CE427FC001281E9 /* SmoothStroke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmoothStroke.h; sourceTree = "<group>"; };
+		72C6E7AC1CE427FC001281E9 /* SmoothStroke.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SmoothStroke.m; sourceTree = "<group>"; };
+		72C6E7AD1CE427FC001281E9 /* Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
+		72C6E7AE1CE427FC001281E9 /* Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Helper.m; sourceTree = "<group>"; };
+		72C6E7B11CE427FC001281E9 /* UIColor+Components.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Components.h"; sourceTree = "<group>"; };
+		72C6E7B21CE427FC001281E9 /* UIColor+Components.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Components.m"; sourceTree = "<group>"; };
+		72C6E7B31CE427FC001281E9 /* UIEvent+iOS8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIEvent+iOS8.h"; sourceTree = "<group>"; };
+		72C6E7B41CE427FC001281E9 /* UIEvent+iOS8.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIEvent+iOS8.m"; sourceTree = "<group>"; };
+		72C6E7CC1CE42BCF001281E9 /* brush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush.png; sourceTree = "<group>"; };
+		72C6E7CD1CE42BCF001281E9 /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
+		72C6E7D51CE44384001281E9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		72C6E7D71CE4439D001281E9 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		72C6E7D91CE45174001281E9 /* AdonitViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdonitViewController.h; sourceTree = "<group>"; };
+		72C6E7DA1CE45174001281E9 /* AdonitViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdonitViewController.m; sourceTree = "<group>"; };
+		72C6E7DB1CE45174001281E9 /* AdonitViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AdonitViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,6 +283,7 @@
 			files = (
 				121DDC911CCD504700C40724 /* libxml2.2.tbd in Frameworks */,
 				72BA1A4B1CCE0712006849E3 /* CocoaLumberjack.framework in Frameworks */,
+				72C6E7B71CE427FC001281E9 /* AdonitSDK.framework in Frameworks */,
 				122AADE21CCD3FA200677FF1 /* libSVGKit-iOS.2.0.0.a in Frameworks */,
 				122AAC261CCCAA8F00677FF1 /* Foundation.framework in Frameworks */,
 				122AAC1F1CCCA9E800677FF1 /* UIKit.framework in Frameworks */,
@@ -288,6 +337,7 @@
 		122AABD81CCCA28800677FF1 /* calligraphyDemo */ = {
 			isa = PBXGroup;
 			children = (
+				72C6E7971CE427FC001281E9 /* Adonit-iOS-SDK */,
 				7297A5661CD99D13003682A1 /* GLPaint */,
 				7277E29B1CCF0808000D5E35 /* categroy */,
 				122AADC81CCD345A00677FF1 /* SVG */,
@@ -337,6 +387,8 @@
 		122AAC111CCCA98000677FF1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72C6E7D71CE4439D001281E9 /* CoreMotion.framework */,
+				72C6E7D51CE44384001281E9 /* SystemConfiguration.framework */,
 				121DDC901CCD504700C40724 /* libxml2.2.tbd */,
 				122AAC251CCCAA8F00677FF1 /* Foundation.framework */,
 				122AAC1E1CCCA9E800677FF1 /* UIKit.framework */,
@@ -452,6 +504,58 @@
 				7297A5851CD99D13003682A1 /* shaderUtil.h */,
 			);
 			path = UtilSrc;
+			sourceTree = "<group>";
+		};
+		72C6E7971CE427FC001281E9 /* Adonit-iOS-SDK */ = {
+			isa = PBXGroup;
+			children = (
+				72C6E79D1CE427FC001281E9 /* Drawing Engine : Line Interpolation */,
+				72C6E7981CE427FC001281E9 /* AdonitSDK.bundle */,
+				72C6E7991CE427FC001281E9 /* AdonitSDK.framework */,
+				72C6E79A1CE427FC001281E9 /* CanvasView.h */,
+				72C6E79B1CE427FC001281E9 /* CanvasView.m */,
+				72C6E7AD1CE427FC001281E9 /* Helper.h */,
+				72C6E7AE1CE427FC001281E9 /* Helper.m */,
+				72C6E7B11CE427FC001281E9 /* UIColor+Components.h */,
+				72C6E7B21CE427FC001281E9 /* UIColor+Components.m */,
+				72C6E7B31CE427FC001281E9 /* UIEvent+iOS8.h */,
+				72C6E7B41CE427FC001281E9 /* UIEvent+iOS8.m */,
+				72C6E7CC1CE42BCF001281E9 /* brush.png */,
+				72C6E7CD1CE42BCF001281E9 /* brush1.png */,
+				72C6E7D91CE45174001281E9 /* AdonitViewController.h */,
+				72C6E7DA1CE45174001281E9 /* AdonitViewController.m */,
+				72C6E7DB1CE45174001281E9 /* AdonitViewController.xib */,
+			);
+			path = "Adonit-iOS-SDK";
+			sourceTree = "<group>";
+		};
+		72C6E79D1CE427FC001281E9 /* Drawing Engine : Line Interpolation */ = {
+			isa = PBXGroup;
+			children = (
+				72C6E79E1CE427FC001281E9 /* Brush.h */,
+				72C6E79F1CE427FC001281E9 /* Brush.m */,
+				72C6E7A01CE427FC001281E9 /* Path Elements */,
+				72C6E7A91CE427FC001281E9 /* SegmentSmoother.h */,
+				72C6E7AA1CE427FC001281E9 /* SegmentSmoother.m */,
+				72C6E7AB1CE427FC001281E9 /* SmoothStroke.h */,
+				72C6E7AC1CE427FC001281E9 /* SmoothStroke.m */,
+			);
+			path = "Drawing Engine : Line Interpolation";
+			sourceTree = "<group>";
+		};
+		72C6E7A01CE427FC001281E9 /* Path Elements */ = {
+			isa = PBXGroup;
+			children = (
+				72C6E7A11CE427FC001281E9 /* AbstractBezierPathElement.h */,
+				72C6E7A21CE427FC001281E9 /* AbstractBezierPathElement.m */,
+				72C6E7A31CE427FC001281E9 /* CurveToPathElement.h */,
+				72C6E7A41CE427FC001281E9 /* CurveToPathElement.m */,
+				72C6E7A51CE427FC001281E9 /* LineToPathElement.h */,
+				72C6E7A61CE427FC001281E9 /* LineToPathElement.m */,
+				72C6E7A71CE427FC001281E9 /* MoveToPathElement.h */,
+				72C6E7A81CE427FC001281E9 /* MoveToPathElement.m */,
+			);
+			path = "Path Elements";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -625,11 +729,13 @@
 				7297A5901CD99D13003682A1 /* Purple.png in Resources */,
 				7297A5861CD99D13003682A1 /* Erase.caf in Resources */,
 				7297A5951CD99D13003682A1 /* Recording.data in Resources */,
+				72C6E7CF1CE42BCF001281E9 /* brush1.png in Resources */,
 				7297A58B1CD99D13003682A1 /* Icon-Small.png in Resources */,
 				7297A5891CD99D13003682A1 /* Icon-72.png in Resources */,
 				7297A5A41CD9A118003682A1 /* brush.png in Resources */,
 				122AABEC1CCCA28800677FF1 /* LaunchScreen.storyboard in Resources */,
 				7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */,
+				72C6E7CE1CE42BCF001281E9 /* brush.png in Resources */,
 				122AADE71CCD475000677FF1 /* Coins.svg in Resources */,
 				122AABE91CCCA28800677FF1 /* Assets.xcassets in Resources */,
 				126DC1BC1CDF83E700BFD1E2 /* test.svg in Resources */,
@@ -640,8 +746,10 @@
 				7297A58A1CD99D13003682A1 /* Icon-Small-50.png in Resources */,
 				122AABE71CCCA28800677FF1 /* Main.storyboard in Resources */,
 				7297A58D1CD99D13003682A1 /* Icon.png in Resources */,
+				72C6E7B61CE427FC001281E9 /* AdonitSDK.bundle in Resources */,
 				7297A5881CD99D13003682A1 /* Green.png in Resources */,
 				7297A58C1CD99D13003682A1 /* Icon-Small@2x.png in Resources */,
+				72C6E7DD1CE45174001281E9 /* AdonitViewController.xib in Resources */,
 				7297A58F1CD99D13003682A1 /* iTunesArtwork in Resources */,
 				126DC1C51CE0D99E00BFD1E2 /* er.svg in Resources */,
 			);
@@ -669,17 +777,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				122AABDE1CCCA28800677FF1 /* AppDelegate.m in Sources */,
+				72C6E7BB1CE427FC001281E9 /* AbstractBezierPathElement.m in Sources */,
+				72C6E7C51CE427FC001281E9 /* UIEvent+iOS8.m in Sources */,
 				7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */,
+				72C6E7C01CE427FC001281E9 /* SmoothStroke.m in Sources */,
+				72C6E7BE1CE427FC001281E9 /* MoveToPathElement.m in Sources */,
 				7297A59B1CD99D13003682A1 /* shaderUtil.c in Sources */,
+				72C6E7C41CE427FC001281E9 /* UIColor+Components.m in Sources */,
 				7297A5931CD99D13003682A1 /* PaintingView.m in Sources */,
+				72C6E7BD1CE427FC001281E9 /* LineToPathElement.m in Sources */,
+				72C6E7C11CE427FC001281E9 /* Helper.m in Sources */,
+				72C6E7B81CE427FC001281E9 /* CanvasView.m in Sources */,
+				72C6E7BA1CE427FC001281E9 /* Brush.m in Sources */,
+				72C6E7BC1CE427FC001281E9 /* CurveToPathElement.m in Sources */,
 				122AABE11CCCA28800677FF1 /* MasterViewController.m in Sources */,
 				122AABDB1CCCA28800677FF1 /* main.m in Sources */,
+				72C6E7BF1CE427FC001281E9 /* SegmentSmoother.m in Sources */,
 				7297A5941CD99D13003682A1 /* PaintingViewController.m in Sources */,
 				126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */,
 				7297A59A1CD99D13003682A1 /* fileUtil.m in Sources */,
 				7297A5991CD99D13003682A1 /* SoundEffect.m in Sources */,
 				7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */,
 				122AABE41CCCA28800677FF1 /* DetailViewController.m in Sources */,
+				72C6E7DC1CE45174001281E9 /* AdonitViewController.m in Sources */,
 				72574D3A1CE1D325000AB45F /* SVGDrawingView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -831,11 +951,13 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS",
+					"$(PROJECT_DIR)/calligraphyDemo/Adonit-iOS-SDK",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
@@ -865,11 +987,13 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS",
+					"$(PROJECT_DIR)/calligraphyDemo/Adonit-iOS-SDK",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
