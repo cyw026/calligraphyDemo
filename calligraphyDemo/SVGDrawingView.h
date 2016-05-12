@@ -23,6 +23,9 @@ typedef enum : NSUInteger {
 
 @interface SVGDrawingView : SVGKLayeredImageView
 
+
+@property (nonatomic, retain) CALayer *penLayer;
+
 - (id)initWithSVGName:(NSString *)svgName;
 
 @end

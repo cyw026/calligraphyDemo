@@ -34,6 +34,8 @@
         
         UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
         self.backgroundColor = [UIColor colorWithPatternImage:image];
+        
+        [self setupDrawingLayer];
     }
     return self;
 }
@@ -102,6 +104,45 @@
 //    }
 //}
 
+- (void) setupDrawingLayer
+{
+    [self.penLayer removeFromSuperlayer];
+    self.penLayer = nil;
+    
+    UIImage *penImage = [UIImage imageNamed:@"finger.png"];
+    CALayer *penLayer = [CALayer layer];
+    penLayer.contents = (id)penImage.CGImage;
+    penLayer.anchorPoint = CGPointMake(0.38, 0.1);
+    penLayer.frame = CGRectMake(0.0f, 0.0f, penImage.size.width, penImage.size.height);
+    penLayer.hidden = YES;
+    [self.layer addSublayer:penLayer];
+    
+    self.penLayer = penLayer;
+}
+
+- (void) startAnimationWithPath:(CGPathRef )path
+{
+    [self.penLayer removeAllAnimations];
+    
+    self.penLayer.hidden = NO;
+    
+    
+    CAKeyframeAnimation *penAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    penAnimation.duration = 2.0;
+    penAnimation.path = path;
+    penAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    penAnimation.removedOnCompletion = NO;
+    penAnimation.repeatCount = MAXFLOAT;
+    penAnimation.delegate = self;
+    [self.penLayer addAnimation:penAnimation forKey:@"position"];
+}
+
+- (void) animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    //self.penLayer.hidden = YES;
+}
+
+
 /**
  *  取消当前图层的选中状态
  */
@@ -139,6 +180,11 @@
             lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_TOP superlayer:hitLayer.superlayer];
             //
             
+            CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
+            
+            UIBezierPath *fingerPath  = [[UIBezierPath bezierPathWithCGPath:layer_m.path] covertPathFromLayer:layer_m toLayer:self.layer];
+
+            [self startAnimationWithPath:fingerPath.CGPath];
             
             UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
             if (drawingPath == nil) {
