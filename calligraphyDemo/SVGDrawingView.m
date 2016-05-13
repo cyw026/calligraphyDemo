@@ -7,6 +7,7 @@
 //
 
 #import "SVGDrawingView.h"
+#import "Stroke.h"
 
 @interface SVGDrawingView ()
 {
@@ -16,11 +17,23 @@
     
     UIBezierPath *movingPath;
     UIImage *incrementalImage;
+    
+    NSUInteger strokeCount;
 }
+
+@property (nonatomic, strong) NSMutableArray *strokeArray;
 
 @end
 
 @implementation SVGDrawingView
+
+- (NSMutableArray *)strokeArray
+{
+    if (_strokeArray == nil) {
+        _strokeArray = [NSMutableArray array];
+    }
+    return _strokeArray;
+}
 
 - (id)initWithSVGName:(NSString *)svgName
 {
@@ -34,6 +47,8 @@
         
         UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
         self.backgroundColor = [UIColor colorWithPatternImage:image];
+        
+        [self parseStrokeInfomation];
         
         [self setupDrawingLayer];
     }
@@ -177,14 +192,14 @@
             else {
                 [self deselectTappedLayer];
             }
-            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_TOP superlayer:hitLayer.superlayer];
+            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
             //
             
-            CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
+            //CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
             
-            UIBezierPath *fingerPath  = [[UIBezierPath bezierPathWithCGPath:layer_m.path] covertPathFromLayer:layer_m toLayer:self.layer];
+            //UIBezierPath *fingerPath  = [[UIBezierPath bezierPathWithCGPath:layer_m.path] covertPathFromLayer:layer_m toLayer:self.layer];
 
-            [self startAnimationWithPath:fingerPath.CGPath];
+            //[self startAnimationWithPath:fingerPath.CGPath];
             
             UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
             if (drawingPath == nil) {
@@ -220,7 +235,7 @@
         CALayer* hitLayer = [layerForHitTesting hitTest:p];
         NSLog(@"[hitLayer class]:%@", NSStringFromClass([hitLayer class]));
         if ([hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
-            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_TOP superlayer:hitLayer.superlayer];
+            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
         }
     }
         
@@ -236,21 +251,6 @@
             UIBezierPath *bezierPath_m = [UIBezierPath bezierPathWithCGPath:layer_m.path];
             UIBezierPath *bezierPath_l = [UIBezierPath bezierPathWithCGPath:layer_l.path];;
             UIBezierPath *bezierPath_r = [UIBezierPath bezierPathWithCGPath:layer_r.path];;
-            
-            BOOL bSubdivide = [lastTappedLayer valueForKey:kSubdivideFlagKey];
-            
-            if (!bSubdivide) {
-                
-                bezierPath_m = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_m.path]];
-                bezierPath_l = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_l.path]];
-                bezierPath_r = [UIBezierPath pathWithPath:[UIBezierPath bezierPathWithCGPath:layer_r.path]];
-                
-                layer_m.path = bezierPath_m.CGPath;
-                layer_l.path = bezierPath_l.CGPath;
-                layer_r.path = bezierPath_r.CGPath;
-                
-                [lastTappedLayer setValue:@(1) forKey:kSubdivideFlagKey];
-            }
             
             
             CGPathRef path_m = bezierPath_m.CGPath;
@@ -306,7 +306,7 @@
             //CGPathCloseSubpath(newPath);
             //[drawingPath appendPath:[UIBezierPath bezierPathWithCGPath:newPath]];
             
-            NSLog(@"drawingPath:%@", movingPath);
+            //NSLog(@"drawingPath:%@", movingPath);
             
             //lastTappedLayer.delegate = self;
             //[lastTappedLayer setNeedsDisplay];
@@ -406,6 +406,8 @@
     lastTappedLayer = nil;
 }
 
+
+#pragma mark -- PRIVATE METHOD
 - (CAShapeLayer *)getPathLayerByIndex:(PATHLAYER_INDEX) index superlayer:(CALayer*)superlayer
 {
     CAShapeLayer *shapeLayer;
@@ -420,6 +422,52 @@
         }
     }
     return shapeLayer;
+}
+
+- (void)parseStrokeInfomation
+{
+    SVGKLayer* selfLayer = (SVGKLayer*)self.layer;
+    CALayer *groupLayer = [selfLayer.SVGImage layerWithIdentifier:@"stroke_group"];
+    
+    Stroke *stroke = [[Stroke alloc] init];
+    
+    NSDate* tmpStartData = [NSDate date];
+    
+    for (CALayer *child in groupLayer.sublayers) {
+        // 根据索引分别得到笔划轮廓的路径和左中右三条辅助线
+        CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:child];
+        CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:child];
+        CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:child];
+        CAShapeLayer *layer_c = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:child];
+        
+        NSLog(@"l:%@, m:%@, r:%@, c:%@", [layer_l valueForKey:kSVGElementIdentifier], [layer_m valueForKey:kSVGElementIdentifier], [layer_r valueForKey:kSVGElementIdentifier], [layer_c valueForKey:kSVGElementIdentifier]);
+        
+        stroke.guidesPath_L = [UIBezierPath bezierPathWithCGPath:layer_l.path];
+        stroke.guidesPath_M = [UIBezierPath bezierPathWithCGPath:layer_m.path];
+        stroke.guidesPath_R = [UIBezierPath bezierPathWithCGPath:layer_r.path];
+        stroke.contourPath  = [UIBezierPath bezierPathWithCGPath:layer_c.path];
+        
+        // 把原始左中右三条辅助线拆分重新赋值给对应图层
+        stroke.guidesPath_L = [UIBezierPath pathWithPath:stroke.guidesPath_L];
+        stroke.guidesPath_M = [UIBezierPath pathWithPath:stroke.guidesPath_M];
+        stroke.guidesPath_R = [UIBezierPath pathWithPath:stroke.guidesPath_R];
+            
+        layer_m.path = stroke.guidesPath_M.CGPath;
+        layer_l.path = stroke.guidesPath_L.CGPath;
+        layer_r.path = stroke.guidesPath_R.CGPath;
+        
+        // 把所有路径的坐标信息都转换到绘制图层
+        stroke.guidesPath_L  = [stroke.guidesPath_L covertPathFromLayer:layer_l toLayer:self.layer];
+        stroke.guidesPath_M  = [stroke.guidesPath_L covertPathFromLayer:layer_m toLayer:self.layer];
+        stroke.guidesPath_R  = [stroke.guidesPath_R covertPathFromLayer:layer_r toLayer:self.layer];
+        stroke.contourPath   = [stroke.contourPath covertPathFromLayer:layer_c toLayer:self.layer];
+        
+        [self.strokeArray addObject:stroke];
+    }
+    
+    double deltaTime = [[NSDate date] timeIntervalSinceDate:tmpStartData];
+    NSLog(@">>>>>>>>>>cost time = %f ms", deltaTime*1000);
+    
 }
 
 @end

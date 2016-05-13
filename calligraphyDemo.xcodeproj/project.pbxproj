@@ -61,6 +61,7 @@
 		7297A5A41CD9A118003682A1 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A31CD9A118003682A1 /* brush.png */; };
 		7297A5A71CD9CD8F003682A1 /* CBrush.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297A5A61CD9CD8F003682A1 /* CBrush.m */; };
 		7297A5AA1CD9D48A003682A1 /* brush1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7297A5A91CD9D48A003682A1 /* brush1.png */; };
+		729D74321CE56BB700B4F5E2 /* Stroke.m in Sources */ = {isa = PBXBuildFile; fileRef = 729D74311CE56BB700B4F5E2 /* Stroke.m */; };
 		72A3966F1CDB286800D40D37 /* brush2.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A3966E1CDB286800D40D37 /* brush2.png */; };
 		72A396761CDB2D1200D40D37 /* brush3.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A396751CDB2D1200D40D37 /* brush3.png */; };
 		72BA1A441CCE0629006849E3 /* drawing.svg in Resources */ = {isa = PBXBuildFile; fileRef = 72BA1A431CCE0629006849E3 /* drawing.svg */; };
@@ -239,6 +240,8 @@
 		7297A5A51CD9CD8F003682A1 /* CBrush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBrush.h; sourceTree = "<group>"; };
 		7297A5A61CD9CD8F003682A1 /* CBrush.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBrush.m; sourceTree = "<group>"; };
 		7297A5A91CD9D48A003682A1 /* brush1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush1.png; sourceTree = "<group>"; };
+		729D74301CE56BB700B4F5E2 /* Stroke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stroke.h; sourceTree = "<group>"; };
+		729D74311CE56BB700B4F5E2 /* Stroke.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Stroke.m; sourceTree = "<group>"; };
 		72A3966E1CDB286800D40D37 /* brush2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush2.png; sourceTree = "<group>"; };
 		72A396751CDB2D1200D40D37 /* brush3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush3.png; sourceTree = "<group>"; };
 		72BA1A431CCE0629006849E3 /* drawing.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = drawing.svg; sourceTree = "<group>"; };
@@ -354,6 +357,8 @@
 				122AABD91CCCA28800677FF1 /* Supporting Files */,
 				72574D381CE1D325000AB45F /* SVGDrawingView.h */,
 				72574D391CE1D325000AB45F /* SVGDrawingView.m */,
+				729D74301CE56BB700B4F5E2 /* Stroke.h */,
+				729D74311CE56BB700B4F5E2 /* Stroke.m */,
 			);
 			path = calligraphyDemo;
 			sourceTree = "<group>";
@@ -785,6 +790,7 @@
 				7297A59B1CD99D13003682A1 /* shaderUtil.c in Sources */,
 				72C6E7C41CE427FC001281E9 /* UIColor+Components.m in Sources */,
 				7297A5931CD99D13003682A1 /* PaintingView.m in Sources */,
+				729D74321CE56BB700B4F5E2 /* Stroke.m in Sources */,
 				72C6E7BD1CE427FC001281E9 /* LineToPathElement.m in Sources */,
 				72C6E7C11CE427FC001281E9 /* Helper.m in Sources */,
 				72C6E7B81CE427FC001281E9 /* CanvasView.m in Sources */,
