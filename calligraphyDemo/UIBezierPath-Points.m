@@ -144,7 +144,7 @@ void pointsFromBezier(void *info, const CGPathElement *element)
     return nearestPoint;
 }
 
-- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end
+- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end forceStart:(BOOL)forceStart forceEnd:(BOOL)forceEnd
 {
     UIBezierPath *path = [UIBezierPath bezierPath];
     
@@ -176,12 +176,14 @@ void pointsFromBezier(void *info, const CGPathElement *element)
             case kCGPathElementAddLineToPoint:
                 if (points.count == 2)
                 {
-                    float tempDist = distance(start, POINT(1));
+                    CGPoint LineTo = POINT(1);
+                    
+                    float tempDist = distance(start, LineTo);
                     if (tempDist < distance1) {
                         distance1 = tempDist;
                         startIndex = index;
                     }
-                    float ED = distance(end, POINT(1));
+                    float ED = distance(end, LineTo);
                     if (ED < distance2) {
                         distance2 = ED;
                         endIndex = index;
@@ -232,12 +234,12 @@ void pointsFromBezier(void *info, const CGPathElement *element)
     
     NSArray *startPoint = elements[0];
     CGPoint endPoint = [self currentPoint]; //结束点
-    if (distance([startPoint[1] CGPointValue], [from[1] CGPointValue]) < 10) {
+    if (forceStart) {
         startIndex = 0;
         from = startPoint;
     }
     
-    if (distance(endPoint, [to[1] CGPointValue]) < 10) {
+    if (forceEnd) {
         endIndex = self.bezierElements.count - 1;
     }
     

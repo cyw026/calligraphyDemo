@@ -19,6 +19,7 @@
     UIImage *incrementalImage;
     
     NSUInteger strokeCount;
+    NSUInteger currStep;
 }
 
 @property (nonatomic, strong) NSMutableArray *strokeArray;
@@ -44,6 +45,7 @@
     if (self = [super initWithSVGKImage:svgImage]) {
         self.showBorder = FALSE;
         movingPath = [UIBezierPath bezierPath];
+        currStep = 0;
         
         UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
         self.backgroundColor = [UIColor colorWithPatternImage:image];
@@ -51,6 +53,9 @@
         [self parseStrokeInfomation];
         
         [self setupDrawingLayer];
+        
+        // 2s之后开始播放第一笔划的指引动画
+        [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
     }
     return self;
 }
@@ -62,6 +67,21 @@
 - (void)drawRect:(CGRect)rect {
     // Drawing code
     [super drawRect:rect];
+    
+    /**
+     *  绘制笔划填充颜色
+     *
+     *  @return 由于直接在SVG文件填充会遮盖住绘制的笔划，所以在这里才根据路径重新填充
+     */
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    
+    for (Stroke *stroke in self.strokeArray) {
+        CGPathRef path = stroke.contourPath.CGPath;
+        CGContextSetFillColorWithColor(ctx, stroke.fillColor.CGColor);
+        CGContextAddPath(ctx, path);
+        CGContextFillPath(ctx);
+        CGContextSaveGState(ctx);
+    }
     
     [incrementalImage drawInRect:rect];
 }
@@ -135,21 +155,46 @@
     self.penLayer = penLayer;
 }
 
-- (void) startAnimationWithPath:(CGPathRef )path
+/**
+ *  播放手势动画
+ */
+- (void) palyAnimation
 {
+    Stroke *stroke;
     [self.penLayer removeAllAnimations];
     
-    self.penLayer.hidden = NO;
-    
-    
-    CAKeyframeAnimation *penAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    penAnimation.duration = 2.0;
-    penAnimation.path = path;
-    penAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    penAnimation.removedOnCompletion = NO;
-    penAnimation.repeatCount = MAXFLOAT;
-    penAnimation.delegate = self;
-    [self.penLayer addAnimation:penAnimation forKey:@"position"];
+    for (Stroke *obj in self.strokeArray) {
+        if (!obj.animPlayFlag) {
+            stroke = obj;
+            currStep = [self.strokeArray indexOfObject:obj];
+            break;
+        }
+    }
+    // 如果存在未播放动画的笔划
+    if (stroke) {
+        // 1、高亮显示当前笔划
+        stroke.fillColor = [UIColor redColor];
+        [self setNeedsDisplay];
+        // 2、添加动画
+        self.penLayer.hidden = NO;
+        CAKeyframeAnimation *penAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+        penAnimation.duration = 2.0;
+        penAnimation.path = stroke.guidesPath_M.CGPath;
+        penAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        penAnimation.removedOnCompletion = NO;
+        penAnimation.repeatCount = MAXFLOAT;
+        penAnimation.delegate = self;
+        [self.penLayer addAnimation:penAnimation forKey:@"position"];
+    }
+}
+
+/**
+ *  停止播放手势动画
+ */
+- (void)stopAnimation
+{
+    [self.penLayer removeAllAnimations];
+    self.penLayer.hidden = YES;
 }
 
 - (void) animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
@@ -179,6 +224,9 @@
     UITouch *touch = touches.anyObject;
     CGPoint p = [touch locationInView:self];
     
+    // 停止手势动画
+    [self stopAnimation];
+    
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
     
@@ -193,21 +241,6 @@
                 [self deselectTappedLayer];
             }
             lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
-            //
-            
-            //CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
-            
-            //UIBezierPath *fingerPath  = [[UIBezierPath bezierPathWithCGPath:layer_m.path] covertPathFromLayer:layer_m toLayer:self.layer];
-
-            //[self startAnimationWithPath:fingerPath.CGPath];
-            
-            UIBezierPath *drawingPath = [hitLayer valueForKey:kDrawingPathKey];
-            if (drawingPath == nil) {
-                drawingPath = [UIBezierPath bezierPath];
-                drawingPath.lineJoinStyle = kCGLineJoinBevel;
-                drawingPath.lineCapStyle = kCGLineCapRound;
-                [hitLayer setValue:drawingPath forKey:kDrawingPathKey];
-            }
             
             //[drawingPath moveToPoint:p1];
         }
@@ -242,49 +275,33 @@
         if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
             
-            
-            
-            CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:lastTappedLayer.superlayer];
-            CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:lastTappedLayer.superlayer];
-            CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:lastTappedLayer.superlayer];
-            
-            UIBezierPath *bezierPath_m = [UIBezierPath bezierPathWithCGPath:layer_m.path];
-            UIBezierPath *bezierPath_l = [UIBezierPath bezierPathWithCGPath:layer_l.path];;
-            UIBezierPath *bezierPath_r = [UIBezierPath bezierPathWithCGPath:layer_r.path];;
-            
-            
-            CGPathRef path_m = bezierPath_m.CGPath;
-            
-            CGPoint prevTouch = [layer_m convertPoint:prevPoint fromLayer:self.layer];
-            CGPoint touchPoint = [layer_m convertPoint:p fromLayer:self.layer];
+            Stroke *stroke = [self strokeByIdentifier:[lastTappedLayer valueForKey:kSVGElementIdentifier]];
+            // 停止手势动画，把当前笔划标记为已播放
+            [self stopAnimation];
+            stroke.animPlayFlag = 1;
             
             NSUInteger startIndex, endIndex;
             UIBezierPath *leftPath, *rightPath;
+            // 滑动前后两点
+            CGPoint P1 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:prevPoint index:&startIndex];
+            CGPoint P2 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:p index:&endIndex];
             
-            CGPoint P1 = [UIBezierPath pointAdjacent:path_m withPoint:prevTouch index:&startIndex];
-            CGPoint P2 = [UIBezierPath pointAdjacent:path_m withPoint:touchPoint index:&endIndex];
-            
-            CGPoint startPointOnLeft  = [layer_l convertPoint:P1 fromLayer:layer_m];
-            CGPoint endPointOnLeft  = [layer_l convertPoint:P2 fromLayer:layer_m];
-            
-            CGPoint startPointOnRight = [layer_r convertPoint:P1 fromLayer:layer_m];
-            CGPoint endPointOnRight = [layer_r convertPoint:P2 fromLayer:layer_m];
-            
-            
-            if (startIndex < endIndex) {
+            if (startIndex <= endIndex) {
                 // 升序
-                leftPath = [bezierPath_l pathWithStart:endPointOnLeft end:startPointOnLeft];
-                rightPath = [bezierPath_r pathWithStart:startPointOnRight end:endPointOnRight];
+                BOOL forceStart = startIndex < 10 ? YES:NO;
+                BOOL forceEnd   = stroke.guidesPath_M.points.count - endIndex < 10 ? YES:NO;
+                // 靠近两端的直接取起hkok或者终点
+                leftPath = [stroke.guidesPath_L pathWithStart:P2 end:P1 forceStart:forceEnd forceEnd:forceStart];
+                rightPath = [stroke.guidesPath_R pathWithStart:P1 end:P2 forceStart:forceStart forceEnd:forceEnd];
             } else {
                 // 降序
-                leftPath = [bezierPath_l pathWithStart:startPointOnLeft end:endPointOnLeft];
-                rightPath = [bezierPath_r pathWithStart:endPointOnRight end:startPointOnRight];
+                BOOL forceStart = endIndex < 10 ? YES:NO;
+                BOOL forceEnd   = stroke.guidesPath_M.points.count - startIndex < 10 ? YES:NO;
+                
+                leftPath = [stroke.guidesPath_L pathWithStart:P1 end:P2 forceStart:forceEnd forceEnd:forceStart];
+                rightPath = [stroke.guidesPath_R pathWithStart:P2 end:P1 forceStart:forceStart forceEnd:forceEnd];
             }
             
-            leftPath  = [leftPath covertPathFromLayer:layer_l toLayer:self.layer];
-            rightPath = [rightPath covertPathFromLayer:layer_r toLayer:self.layer];
-            
-            bezierPath_m = [bezierPath_m covertPathFromLayer:layer_m toLayer:self.layer];
             
             if (CGPathIsEmpty(movingPath.CGPath)) {
                 movingPath  = [leftPath combineWithPath:rightPath];
@@ -292,52 +309,29 @@
                 movingPath  = [leftPath combineWithPath:movingPath];
                 movingPath = [movingPath combineWithPath:rightPath];
             }
-            
-            //NSArray *startPoint = leftPath.bezierElements[0];
-            //[movingPath addLineToPoint:[startPoint[1] CGPointValue]];
-            
             [movingPath closePath];
             
-            //UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-            //CGMutablePathRef newPath = CGPathCreateMutable();
-            
-            //CGPathAddPath(newPath, NULL, movingPath.CGPath);
-            //CGPathAddPath(newPath, NULL, rightPath.CGPath);
-            //CGPathCloseSubpath(newPath);
-            //[drawingPath appendPath:[UIBezierPath bezierPathWithCGPath:newPath]];
-            
-            //NSLog(@"drawingPath:%@", movingPath);
-            
-            //lastTappedLayer.delegate = self;
-            //[lastTappedLayer setNeedsDisplay];
             
             CGRect bounds = self.bounds;
             
-            UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0.0);
-            
-            CGPathRef clipPathRef = CGPathCreateCopy(lastTappedLayer.path);
-            UIBezierPath *clipPath = [UIBezierPath bezierPathWithCGPath:clipPathRef];
-            
-            clipPath  = [clipPath covertPathFromLayer:lastTappedLayer toLayer:self.layer];
+            UIGraphicsBeginImageContextWithOptions(bounds.size, NO, 0.0);
             
             
-            
-            if (!incrementalImage)
+            if (incrementalImage)
             {
-                UIBezierPath *rectpath = [UIBezierPath bezierPathWithRect:self.bounds];
-                [[UIColor colorWithPatternImage:[UIImage imageNamed:@"paintingView_BG"]] setFill];
-                [rectpath fill];
+                [incrementalImage drawAtPoint:CGPointZero];
             }
-            [incrementalImage drawAtPoint:CGPointZero];
             
             
             
             [[UIColor blackColor] setStroke];
             [[UIColor blackColor] setFill];
             
+            [stroke.contourPath addClip];
+            
             
 //            [clipPath fill];
-//            
+//
 //            for (NSValue *v in clipPath.points) {
 //                CGPoint point = [v CGPointValue];
 //                UIBezierPath *pointPath = [UIBezierPath bezierPathWithArcCenter:point radius:1 startAngle:0 endAngle:M_PI * 2.0 clockwise:YES];
@@ -345,8 +339,6 @@
 //                [pointPath stroke];
 //                [pointPath fill];
 //            }
-            
-            [clipPath addClip];
             
 //            for (NSValue *v in rightPath.points) {
 //                CGPoint point = [v CGPointValue];
@@ -373,8 +365,6 @@
             [movingPath stroke]; // ................. (8)
             [movingPath fill];
             
-            
-            
             incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             //[movingPath removeAllPoints];
@@ -382,13 +372,6 @@
             
         } else {
             NSLog(@"outOfBoundingBox");
-            //            [movingPath closePath];
-            //
-            //            UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-            //            [drawingPath appendPath:movingPath];
-            //            lastTappedLayer.delegate = self;
-            //            [lastTappedLayer setNeedsDisplay];
-            //
             [movingPath removeAllPoints];
         }
  }
@@ -396,12 +379,18 @@
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    //    UIBezierPath *drawingPath = [lastTappedLayer valueForKey:kDrawingPathKey];
-    //    [movingPath closePath];
-    //    [drawingPath appendPath:movingPath];
     [movingPath removeAllPoints];
-//    lastTappedLayer.delegate = self;
-//    [lastTappedLayer setNeedsDisplay];
+    
+    Stroke *stroke = [self.strokeArray objectAtIndex:currStep];
+    stroke.fillColor = nil;
+    [self setNeedsDisplay];
+    // 倒计时2s之后重新开始动画
+    double delayInSeconds = 2.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        //执行事件
+        [self palyAnimation];
+    });
     
     lastTappedLayer = nil;
 }
@@ -424,21 +413,37 @@
     return shapeLayer;
 }
 
+- (Stroke *)strokeByIdentifier:(NSString *)identifier
+{
+    for (Stroke *stroke in self.strokeArray) {
+        if ([stroke.identifier isEqualToString:identifier]) {
+            return stroke;
+        }
+    }
+    return nil;
+}
+
 - (void)parseStrokeInfomation
 {
     SVGKLayer* selfLayer = (SVGKLayer*)self.layer;
     CALayer *groupLayer = [selfLayer.SVGImage layerWithIdentifier:@"stroke_group"];
     
-    Stroke *stroke = [[Stroke alloc] init];
+    
     
     NSDate* tmpStartData = [NSDate date];
     
     for (CALayer *child in groupLayer.sublayers) {
+        
+        Stroke *stroke = [[Stroke alloc] init];
+        
         // 根据索引分别得到笔划轮廓的路径和左中右三条辅助线
         CAShapeLayer *layer_l = [self getPathLayerByIndex:PATHLAYER_INDEX_LEFT superlayer:child];
         CAShapeLayer *layer_m = [self getPathLayerByIndex:PATHLAYER_INDEX_MIDDLE superlayer:child];
         CAShapeLayer *layer_r = [self getPathLayerByIndex:PATHLAYER_INDEX_RIGHT superlayer:child];
         CAShapeLayer *layer_c = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:child];
+        
+        // 记录轮廓路径的ID
+        stroke.identifier = [layer_c valueForKey:kSVGElementIdentifier];
         
         NSLog(@"l:%@, m:%@, r:%@, c:%@", [layer_l valueForKey:kSVGElementIdentifier], [layer_m valueForKey:kSVGElementIdentifier], [layer_r valueForKey:kSVGElementIdentifier], [layer_c valueForKey:kSVGElementIdentifier]);
         
@@ -458,7 +463,7 @@
         
         // 把所有路径的坐标信息都转换到绘制图层
         stroke.guidesPath_L  = [stroke.guidesPath_L covertPathFromLayer:layer_l toLayer:self.layer];
-        stroke.guidesPath_M  = [stroke.guidesPath_L covertPathFromLayer:layer_m toLayer:self.layer];
+        stroke.guidesPath_M  = [stroke.guidesPath_M covertPathFromLayer:layer_m toLayer:self.layer];
         stroke.guidesPath_R  = [stroke.guidesPath_R covertPathFromLayer:layer_r toLayer:self.layer];
         stroke.contourPath   = [stroke.contourPath covertPathFromLayer:layer_c toLayer:self.layer];
         

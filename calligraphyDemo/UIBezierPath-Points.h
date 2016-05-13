@@ -23,7 +23,8 @@
 + (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point;
 + (CGPoint ) pointAdjacent: (CGPathRef) path withPoint:(CGPoint)point index:(NSUInteger *)index;
 + (NSArray *)curveFactorizationWithFromPoint:(CGPoint) fPoint toPoint:(CGPoint) tPoint controlPoints:(NSArray *)points count:(int) count;
-- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end;
+//- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end;
+- (UIBezierPath *)pathWithStart:(CGPoint)start end:(CGPoint)end forceStart:(BOOL)forceStart forceEnd:(BOOL)forceEnd;
 - (UIBezierPath *)covertPathFromLayer:(CALayer *)from toLayer:(CALayer*)to;
 - (UIBezierPath *)combineWithPath: (UIBezierPath *) path;
 @end
