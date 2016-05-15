@@ -36,8 +36,24 @@
     self.currentColor = [UIColor blackColor];
     [self selectBrush:self.brushButton];
     
+    [self initLeftBarButtonWithImage:@"share" highlightedImage:@"share"];
     [self initRightBarButtonWithImage:@"brush_tool_blue" highlightedImage:@"brush_tool_blue_pressed"];
+}
 
+- (void)initLeftBarButtonWithImage:(NSString *)image highlightedImage:(NSString*)highlightedImage
+{
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, 0, 20, 30);
+    [button addTarget:self action:@selector(handleLeftBarButton:) forControlEvents:UIControlEventTouchUpInside];
+    [button setImage:[UIImage imageNamed:image] forState:UIControlStateNormal];
+    //[button setImage:[UIImage imageNamed:highlightedImage] forState:UIControlStateHighlighted];
+    UIBarButtonItem * leftItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.leftBarButtonItem = leftItem;
+}
+
+- (void)handleLeftBarButton:(UIButton *)button
+{
+    [self.canvasView snapshot];
 }
 
 - (void)initRightBarButtonWithImage:(NSString *)image highlightedImage:(NSString*)highlightedImage
@@ -93,7 +109,7 @@
     CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
     CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
     UIColor *color = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
-    [self setBrushColors:color];
+    [self setBrushColors:color];    
 }
 
 - (void)highlightSelectedButton:(UIButton *)selectedButton;

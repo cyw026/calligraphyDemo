@@ -29,5 +29,6 @@
 - (IBAction) redo;
 
 - (void)setupBrushTexture:(UIImage*)brushImage;
-
+- (UIImage *) glToUIImage;
+- (UIImage*)snapshot;
 @end
