@@ -286,17 +286,18 @@
             CGPoint P1 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:prevPoint index:&startIndex];
             CGPoint P2 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:p index:&endIndex];
             
+            NSInteger d = 10;
             if (startIndex <= endIndex) {
                 // 升序
-                BOOL forceStart = startIndex < 10 ? YES:NO;
-                BOOL forceEnd   = stroke.guidesPath_M.points.count - endIndex < 10 ? YES:NO;
+                BOOL forceStart = startIndex < d ? YES:NO;
+                BOOL forceEnd   = stroke.guidesPath_M.points.count - endIndex < d ? YES:NO;
                 // 靠近两端的直接取起hkok或者终点
                 leftPath = [stroke.guidesPath_L pathWithStart:P2 end:P1 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P1 end:P2 forceStart:forceStart forceEnd:forceEnd];
             } else {
                 // 降序
-                BOOL forceStart = endIndex < 10 ? YES:NO;
-                BOOL forceEnd   = stroke.guidesPath_M.points.count - startIndex < 10 ? YES:NO;
+                BOOL forceStart = endIndex < d ? YES:NO;
+                BOOL forceEnd   = stroke.guidesPath_M.points.count - startIndex < d ? YES:NO;
                 
                 leftPath = [stroke.guidesPath_L pathWithStart:P1 end:P2 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P2 end:P1 forceStart:forceStart forceEnd:forceEnd];
