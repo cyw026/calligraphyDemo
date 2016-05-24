@@ -229,19 +229,22 @@ static float clamp(min, max, value) { return fmaxf(min, fminf(max, value)); }
             UITouch *lastCoalescedTouch = [coalescedTouches lastObject];
             SmoothStroke* currentStroke = [self getStrokeForHash:@(mainTouch.hash)];
             
+            self.currentBrush.velocity = [self velocityForTouch:mainTouch];
+            CGFloat width = [self.currentBrush widthForPressure:0.5];
+            
             for (UITouch *coalescedTouch in coalescedTouches) {
                 CGPoint location = [coalescedTouch locationInView:self];
 
                 if (currentStroke) {
                     
-                self.currentBrush.velocity = [self velocityForTouch:coalescedTouch];
-                CGFloat width = [self.currentBrush widthForPressure:0.5];
+                
+                
                 NSLog(@"velocity:%f", self.currentBrush.velocity);
                 lastDate = [NSDate date];
                     
                  [self addLineToAndRenderStroke:currentStroke
                                         toPoint:location
-                                        toWidth:[self.currentBrush widthForPressure:0.5]
+                                        toWidth:width
                                         toColor:[self colorForVelocity:self.currentBrush.velocity]
                                        withPath:nil
                                    shouldRender:coalescedTouch.timestamp == lastCoalescedTouch.timestamp

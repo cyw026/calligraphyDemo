@@ -36,11 +36,11 @@
     FT_Set_Pixel_Sizes(face, 0, 12); // 12 is the size
     g = face->glyph;
     
-    Text text = Text();
-    
-    text.init(_program, 1); // the size parameter doesn't matter now because we're going to use the fontOpt function
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    Text text = Text();
+//    
+//    text.init(_program, 1); // the size parameter doesn't matter now because we're going to use the fontOpt function
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 - (void)didReceiveMemoryWarning {

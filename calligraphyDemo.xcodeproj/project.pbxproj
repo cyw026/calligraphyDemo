@@ -30,7 +30,6 @@
 		123C3DEF1CEA224000A95CA8 /* FreeTypeTestVC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */; };
 		123C3DF01CEA224000A95CA8 /* FreeTypeTestVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */; };
 		123C3DF11CEA227F00A95CA8 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 123C3DE41CEA21B100A95CA8 /* libFreetype2.a */; };
-		123C3DF71CEA25C300A95CA8 /* Text.mm in Sources */ = {isa = PBXBuildFile; fileRef = 123C3DF51CEA25C300A95CA8 /* Text.mm */; };
 		12559FFD1CE862F900989095 /* 者.svg in Resources */ = {isa = PBXBuildFile; fileRef = 12559FFC1CE862F900989095 /* 者.svg */; };
 		126DC1B11CDB935700BFD1E2 /* brush4.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B01CDB935700BFD1E2 /* brush4.png */; };
 		126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */; };
@@ -219,8 +218,6 @@
 		123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeTypeTestVC.h; sourceTree = "<group>"; };
 		123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FreeTypeTestVC.mm; sourceTree = "<group>"; };
 		123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FreeTypeTestVC.xib; sourceTree = "<group>"; };
-		123C3DF51CEA25C300A95CA8 /* Text.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Text.mm; sourceTree = "<group>"; };
-		123C3DF61CEA25C300A95CA8 /* Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
 		12559FFC1CE862F900989095 /* 者.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "者.svg"; sourceTree = "<group>"; };
 		126DC1B01CDB935700BFD1E2 /* brush4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush4.png; sourceTree = "<group>"; };
 		126DC1B21CDB9CB100BFD1E2 /* LiveCalligraphyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveCalligraphyView.h; sourceTree = "<group>"; };
@@ -390,8 +387,6 @@
 				123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */,
 				123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */,
 				123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */,
-				123C3DF51CEA25C300A95CA8 /* Text.mm */,
-				123C3DF61CEA25C300A95CA8 /* Text.h */,
 			);
 			path = calligraphyDemo;
 			sourceTree = "<group>";
@@ -853,7 +848,6 @@
 				72C6E7B81CE427FC001281E9 /* CanvasView.m in Sources */,
 				72C6E7BA1CE427FC001281E9 /* Brush.m in Sources */,
 				72C6E7BC1CE427FC001281E9 /* CurveToPathElement.m in Sources */,
-				123C3DF71CEA25C300A95CA8 /* Text.mm in Sources */,
 				122AABE11CCCA28800677FF1 /* MasterViewController.m in Sources */,
 				122AABDB1CCCA28800677FF1 /* main.m in Sources */,
 				72C6E7BF1CE427FC001281E9 /* SegmentSmoother.m in Sources */,
