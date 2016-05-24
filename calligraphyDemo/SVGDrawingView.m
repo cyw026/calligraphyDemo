@@ -230,20 +230,35 @@
         SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
         CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
     
-        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
-            // 判断当前选中的是否为笔画的形状图层
-            //hitLayer.strokeColor = [UIColor blackColor].CGColor;
-            //hitLayer.lineWidth = 0;
-            
-            if( hitLayer == lastTappedLayer )
-                [self deselectTappedLayer];
-            else {
-                [self deselectTappedLayer];
-            }
-            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
-            
-            //[drawingPath moveToPoint:p1];
+    NSInteger count = self.strokeArray.count;
+    
+    for (NSInteger i = count - 1; i >= 0; i--) {
+        
+        Stroke *stroke = [self.strokeArray objectAtIndex:i];
+        
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+        
+        if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) ) {
+            lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
+            break;
+        } else {
+            lastTappedLayer = nil;
         }
+    }
+    
+//        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
+//            // 判断当前选中的是否为笔画的形状图层
+//            //hitLayer.strokeColor = [UIColor blackColor].CGColor;
+//            //hitLayer.lineWidth = 0;
+//            
+//            if( hitLayer == lastTappedLayer )
+//                [self deselectTappedLayer];
+//            else {
+//                [self deselectTappedLayer];
+//            }
+//            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
+//            
+//        }
         //        else {
         //            if (lastTappedLayer != nil) {
         //                lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
@@ -261,17 +276,50 @@
     CGPoint p = [touch locationInView:self];
     CGPoint prevPoint = [touch previousLocationInView:self];
     
-    //NSValue *vp = [NSValue valueWithCGPoint:p];
+    SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
+    NSInteger count = self.strokeArray.count;
     
-    if (!lastTappedLayer) {
-        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
-        CALayer* hitLayer = [layerForHitTesting hitTest:p];
-        NSLog(@"[hitLayer class]:%@", NSStringFromClass([hitLayer class]));
-        if ([hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
-            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
+    if (lastTappedLayer) {
+        //如果有选中的笔划并且触摸点在笔划区域内，则视该笔划为当前笔划。否则重新获取触摸点所在笔划。
+        CGPoint p1 = [lastTappedLayer convertPoint:p fromLayer:self.layer];
+        
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(lastTappedLayer.path, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+        BOOL containsStroking = CGPathContainsPoint(strokingPath, NULL, p1, false);
+        BOOL containsPath = CGPathContainsPoint(lastTappedLayer.path, NULL, p1, false);
+        
+        if (!containsPath && !containsStroking) {
+            
+            for (NSInteger i = count - 1; i >= 0; i--) {
+                
+                Stroke *stroke = [self.strokeArray objectAtIndex:i];
+                
+                CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+                
+                if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) || CGPathContainsPoint(strokingPath, NULL, p, false)) {
+                    lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
+                    break;
+                } else {
+                    lastTappedLayer = nil;
+                }
+            }
+        }
+    } else {
+        // 重新获取触摸点所在笔划。
+        for (NSInteger i = count - 1; i >= 0; i--) {
+            Stroke *stroke = [self.strokeArray objectAtIndex:i];
+            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+            // 处于笔划轮廓内或轮廓上均视为在该笔划区域内
+            if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) || CGPathContainsPoint(strokingPath, NULL, p, false)) {
+                lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
+                break;
+            } else {
+                lastTappedLayer = nil;
+            }
         }
     }
-        
+    
+
+    
         if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
             
@@ -294,6 +342,14 @@
                 // 靠近两端的直接取起hkok或者终点
                 leftPath = [stroke.guidesPath_L pathWithStart:P2 end:P1 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P1 end:P2 forceStart:forceStart forceEnd:forceEnd];
+                
+                if (CGPathIsEmpty(movingPath.CGPath)) {
+                    movingPath  = [leftPath combineWithPath:rightPath];
+                } else {
+                    movingPath  = [leftPath combineWithPath:movingPath];
+                    movingPath = [movingPath combineWithPath:rightPath];
+                }
+                
             } else {
                 // 降序
                 BOOL forceStart = endIndex < d ? YES:NO;
@@ -301,15 +357,17 @@
                 
                 leftPath = [stroke.guidesPath_L pathWithStart:P1 end:P2 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P2 end:P1 forceStart:forceStart forceEnd:forceEnd];
+                
+                if (CGPathIsEmpty(movingPath.CGPath)) {
+                    movingPath  = [rightPath combineWithPath:leftPath];
+                } else {
+                    movingPath  = [rightPath combineWithPath:movingPath];
+                    movingPath = [movingPath combineWithPath:leftPath];
+                }
             }
             
             
-            if (CGPathIsEmpty(movingPath.CGPath)) {
-                movingPath  = [leftPath combineWithPath:rightPath];
-            } else {
-                movingPath  = [leftPath combineWithPath:movingPath];
-                movingPath = [movingPath combineWithPath:rightPath];
-            }
+            
             [movingPath closePath];
             
             
