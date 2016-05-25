@@ -27,9 +27,6 @@
 		122AADE21CCD3FA200677FF1 /* libSVGKit-iOS.2.0.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 122AADD51CCD3F5E00677FF1 /* libSVGKit-iOS.2.0.0.a */; };
 		122AADE71CCD475000677FF1 /* Coins.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE51CCD475000677FF1 /* Coins.svg */; };
 		122AADE81CCD475000677FF1 /* CSS.svg in Resources */ = {isa = PBXBuildFile; fileRef = 122AADE61CCD475000677FF1 /* CSS.svg */; };
-		123C3DEF1CEA224000A95CA8 /* FreeTypeTestVC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */; };
-		123C3DF01CEA224000A95CA8 /* FreeTypeTestVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */; };
-		123C3DF11CEA227F00A95CA8 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 123C3DE41CEA21B100A95CA8 /* libFreetype2.a */; };
 		1246BFBC1CF49B3C009E4C4B /* OutsideStrokingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */; };
 		12559FFD1CE862F900989095 /* 者.svg in Resources */ = {isa = PBXBuildFile; fileRef = 12559FFC1CE862F900989095 /* 者.svg */; };
 		126DC1B11CDB935700BFD1E2 /* brush4.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B01CDB935700BFD1E2 /* brush4.png */; };
@@ -155,20 +152,6 @@
 			remoteGlobalIDString = 6639618D16145D0400E58CCA;
 			remoteInfo = "SVGKit-iOS";
 		};
-		123C3DE31CEA21B100A95CA8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 123C3DDF1CEA21B100A95CA8 /* freetype2.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6382B1B10FB0FC5100ECAC02;
-			remoteInfo = Freetype2;
-		};
-		123C3DEA1CEA21BF00A95CA8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 123C3DDF1CEA21B100A95CA8 /* freetype2.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 6382B1B00FB0FC5100ECAC02;
-			remoteInfo = Freetype2;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -215,10 +198,6 @@
 		122AADCB1CCD3F5E00677FF1 /* SVGKit-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "SVGKit-iOS.xcodeproj"; sourceTree = "<group>"; };
 		122AADE51CCD475000677FF1 /* Coins.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Coins.svg; sourceTree = "<group>"; };
 		122AADE61CCD475000677FF1 /* CSS.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CSS.svg; sourceTree = "<group>"; };
-		123C3DDF1CEA21B100A95CA8 /* freetype2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = freetype2.xcodeproj; path = "freetype2-ios/freetype2.xcodeproj"; sourceTree = "<group>"; };
-		123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeTypeTestVC.h; sourceTree = "<group>"; };
-		123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FreeTypeTestVC.mm; sourceTree = "<group>"; };
-		123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FreeTypeTestVC.xib; sourceTree = "<group>"; };
 		1246BFBA1CF49B3C009E4C4B /* OutsideStrokingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutsideStrokingView.h; sourceTree = "<group>"; };
 		1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutsideStrokingView.m; sourceTree = "<group>"; };
 		12559FFC1CE862F900989095 /* 者.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "者.svg"; sourceTree = "<group>"; };
@@ -310,7 +289,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				123C3DF11CEA227F00A95CA8 /* libFreetype2.a in Frameworks */,
 				121DDC911CCD504700C40724 /* libxml2.2.tbd in Frameworks */,
 				72BA1A4B1CCE0712006849E3 /* CocoaLumberjack.framework in Frameworks */,
 				72C6E7B71CE427FC001281E9 /* AdonitSDK.framework in Frameworks */,
@@ -344,7 +322,6 @@
 		122AABCD1CCCA28800677FF1 = {
 			isa = PBXGroup;
 			children = (
-				123C3DDF1CEA21B100A95CA8 /* freetype2.xcodeproj */,
 				72BA1A4A1CCE0712006849E3 /* CocoaLumberjack.framework */,
 				122AADCB1CCD3F5E00677FF1 /* SVGKit-iOS.xcodeproj */,
 				122AABD81CCCA28800677FF1 /* calligraphyDemo */,
@@ -389,9 +366,6 @@
 				1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */,
 				729D74301CE56BB700B4F5E2 /* Stroke.h */,
 				729D74311CE56BB700B4F5E2 /* Stroke.m */,
-				123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */,
-				123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */,
-				123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */,
 			);
 			path = calligraphyDemo;
 			sourceTree = "<group>";
@@ -461,14 +435,6 @@
 				122AADDB1CCD3F5E00677FF1 /* SVGKitFramework-iOSTests.xctest */,
 				122AADDD1CCD3F5E00677FF1 /* SVGKit.framework */,
 				122AADDF1CCD3F5E00677FF1 /* SVGKitFramework-tvOSTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		123C3DE01CEA21B100A95CA8 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				123C3DE41CEA21B100A95CA8 /* libFreetype2.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -620,7 +586,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				123C3DEB1CEA21BF00A95CA8 /* PBXTargetDependency */,
 				122AADE11CCD3F7F00677FF1 /* PBXTargetDependency */,
 			);
 			name = calligraphyDemo;
@@ -699,10 +664,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 123C3DE01CEA21B100A95CA8 /* Products */;
-					ProjectRef = 123C3DDF1CEA21B100A95CA8 /* freetype2.xcodeproj */;
-				},
-				{
 					ProductGroup = 122AADCC1CCD3F5E00677FF1 /* Products */;
 					ProjectRef = 122AADCB1CCD3F5E00677FF1 /* SVGKit-iOS.xcodeproj */;
 				},
@@ -759,13 +720,6 @@
 			remoteRef = 122AADDE1CCD3F5E00677FF1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		123C3DE41CEA21B100A95CA8 /* libFreetype2.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libFreetype2.a;
-			remoteRef = 123C3DE31CEA21B100A95CA8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -797,7 +751,6 @@
 				72C6E7CE1CE42BCF001281E9 /* brush.png in Resources */,
 				122AADE71CCD475000677FF1 /* Coins.svg in Resources */,
 				122AABE91CCCA28800677FF1 /* Assets.xcassets in Resources */,
-				123C3DF01CEA224000A95CA8 /* FreeTypeTestVC.xib in Resources */,
 				126DC1BC1CDF83E700BFD1E2 /* test.svg in Resources */,
 				126DC1B81CDBBBC200BFD1E2 /* brush5.png in Resources */,
 				72BA1A441CCE0629006849E3 /* drawing.svg in Resources */,
@@ -840,7 +793,6 @@
 				122AABDE1CCCA28800677FF1 /* AppDelegate.m in Sources */,
 				72C6E7BB1CE427FC001281E9 /* AbstractBezierPathElement.m in Sources */,
 				72C6E7C51CE427FC001281E9 /* UIEvent+iOS8.m in Sources */,
-				123C3DEF1CEA224000A95CA8 /* FreeTypeTestVC.mm in Sources */,
 				7277E2A81CCF43AF000D5E35 /* UIBezierPath-Points.m in Sources */,
 				72C6E7C01CE427FC001281E9 /* SmoothStroke.m in Sources */,
 				72C6E7BE1CE427FC001281E9 /* MoveToPathElement.m in Sources */,
@@ -901,11 +853,6 @@
 			isa = PBXTargetDependency;
 			name = "SVGKit-iOS";
 			targetProxy = 122AADE01CCD3F7F00677FF1 /* PBXContainerItemProxy */;
-		};
-		123C3DEB1CEA21BF00A95CA8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Freetype2;
-			targetProxy = 123C3DEA1CEA21BF00A95CA8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
