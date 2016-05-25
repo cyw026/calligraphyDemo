@@ -294,4 +294,18 @@ static CGFloat subdivideBezierAtLength (const CGPoint bez[4],
     }
 }
 
+- (CGPoint) subdivideBezierAtLength:(CGFloat) length
+{
+    CGPoint rightBez[4], leftBez[4];
+    CGPoint bez[4];
+    bez[0] = self.startPoint;
+    bez[1] = self.ctrl1;
+    bez[2] = self.ctrl2;
+    bez[3] = self.curveTo;
+    
+    subdivideBezierAtLength(bez, leftBez, rightBez, length, .05);
+    
+    return rightBez[0];
+}
+
 @end

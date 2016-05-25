@@ -32,4 +32,6 @@
            andControl2:(CGPoint)ctrl2;
 
 
+- (CGPoint) subdivideBezierAtLength:(CGFloat) length;
+
 @end

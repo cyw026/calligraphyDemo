@@ -17,12 +17,17 @@
 
 -(id) init{
     if(self = [super init]){
-        point0 = CGPointMake(-1, -1);
-        point1 = CGPointMake(-1, -1); // previous previous point
-        point2 = CGPointMake(-1, -1); // previous touch point
-        point3 = CGPointMake(-1, -1);
+        [self reset];
     }
     return self;
+}
+
+- (void)reset
+{
+    point0 = CGPointMake(-1, -1);
+    point1 = CGPointMake(-1, -1); // previous previous point
+    point2 = CGPointMake(-1, -1); // previous touch point
+    point3 = CGPointMake(-1, -1);
 }
 
 -(AbstractBezierPathElement*) addPoint:(CGPoint)inPoint{

@@ -11,6 +11,12 @@
 #import <QuartzCore/CALayer.h>
 #import "UIBezierPath-Points.h"
 
+#import <OpenGLES/EAGL.h>
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
+#import <AdonitSDK/AdonitSDK.h>
+#import "Brush.h"
+
 #define kDrawingPathKey @"drawingPath"
 #define kSubdivideFlagKey @"subdivideFlag"
 

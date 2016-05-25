@@ -10,7 +10,7 @@
 #import <AdonitSDK/JotConstants.h>
 #import <AdonitSDK/JotStylusManager.h>
 
-#define           VELOCITY_CLAMP_MIN 200
+#define           VELOCITY_CLAMP_MIN 20
 #define           VELOCITY_CLAMP_MAX 2000
 
 @interface Brush : NSObject

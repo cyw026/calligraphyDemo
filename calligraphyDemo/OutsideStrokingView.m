@@ -123,7 +123,7 @@ static float clamp(min, max, value) { return fmaxf(min, fminf(max, value)); }
     // Set the view's scale factor
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     
-    _currentBrush = [[Brush alloc]initWithMinOpac:0.8 maxOpac:1.0 minSize:20.0 maxSize:40 isEraser:NO];
+    _currentBrush = [[Brush alloc]initWithMinOpac:0.8 maxOpac:1.0 minSize:10.0 maxSize:30 isEraser:NO];
     _currentBrush.brushColor = [UIColor blackColor];
     
     self.userInteractionEnabled = NO;
@@ -304,9 +304,10 @@ static float clamp(min, max, value) { return fmaxf(min, fminf(max, value)); }
                     //                                      shouldRender:coalescedTouch.timestamp == lastCoalescedTouch.timestamp
                     //                                  coalescedInteger:coalescedTouches.count];
                     
-                    if (coalescedTouch.timestamp == lastCoalescedTouch.timestamp) {
-                        [self cleanupEndedStroke:currentStroke forHash:@(mainTouch.hash)];
-                    }
+//                    if (coalescedTouch.timestamp == lastCoalescedTouch.timestamp) {
+//                        [self cleanupEndedStroke:currentStroke forHash:@(mainTouch.hash)];
+//                    }
+                    [self cleanupEndedStroke:currentStroke forHash:@(mainTouch.hash)];
                 }
             }
         }
