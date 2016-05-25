@@ -30,6 +30,7 @@
 		123C3DEF1CEA224000A95CA8 /* FreeTypeTestVC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */; };
 		123C3DF01CEA224000A95CA8 /* FreeTypeTestVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */; };
 		123C3DF11CEA227F00A95CA8 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 123C3DE41CEA21B100A95CA8 /* libFreetype2.a */; };
+		1246BFBC1CF49B3C009E4C4B /* OutsideStrokingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */; };
 		12559FFD1CE862F900989095 /* 者.svg in Resources */ = {isa = PBXBuildFile; fileRef = 12559FFC1CE862F900989095 /* 者.svg */; };
 		126DC1B11CDB935700BFD1E2 /* brush4.png in Resources */ = {isa = PBXBuildFile; fileRef = 126DC1B01CDB935700BFD1E2 /* brush4.png */; };
 		126DC1B41CDB9CB100BFD1E2 /* LiveCalligraphyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126DC1B31CDB9CB100BFD1E2 /* LiveCalligraphyView.m */; };
@@ -218,6 +219,8 @@
 		123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeTypeTestVC.h; sourceTree = "<group>"; };
 		123C3DED1CEA224000A95CA8 /* FreeTypeTestVC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FreeTypeTestVC.mm; sourceTree = "<group>"; };
 		123C3DEE1CEA224000A95CA8 /* FreeTypeTestVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FreeTypeTestVC.xib; sourceTree = "<group>"; };
+		1246BFBA1CF49B3C009E4C4B /* OutsideStrokingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutsideStrokingView.h; sourceTree = "<group>"; };
+		1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutsideStrokingView.m; sourceTree = "<group>"; };
 		12559FFC1CE862F900989095 /* 者.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "者.svg"; sourceTree = "<group>"; };
 		126DC1B01CDB935700BFD1E2 /* brush4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush4.png; sourceTree = "<group>"; };
 		126DC1B21CDB9CB100BFD1E2 /* LiveCalligraphyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveCalligraphyView.h; sourceTree = "<group>"; };
@@ -382,6 +385,8 @@
 				122AABD91CCCA28800677FF1 /* Supporting Files */,
 				72574D381CE1D325000AB45F /* SVGDrawingView.h */,
 				72574D391CE1D325000AB45F /* SVGDrawingView.m */,
+				1246BFBA1CF49B3C009E4C4B /* OutsideStrokingView.h */,
+				1246BFBB1CF49B3C009E4C4B /* OutsideStrokingView.m */,
 				729D74301CE56BB700B4F5E2 /* Stroke.h */,
 				729D74311CE56BB700B4F5E2 /* Stroke.m */,
 				123C3DEC1CEA224000A95CA8 /* FreeTypeTestVC.h */,
@@ -849,6 +854,7 @@
 				72C6E7BA1CE427FC001281E9 /* Brush.m in Sources */,
 				72C6E7BC1CE427FC001281E9 /* CurveToPathElement.m in Sources */,
 				122AABE11CCCA28800677FF1 /* MasterViewController.m in Sources */,
+				1246BFBC1CF49B3C009E4C4B /* OutsideStrokingView.m in Sources */,
 				122AABDB1CCCA28800677FF1 /* main.m in Sources */,
 				72C6E7BF1CE427FC001281E9 /* SegmentSmoother.m in Sources */,
 				7297A5941CD99D13003682A1 /* PaintingViewController.m in Sources */,

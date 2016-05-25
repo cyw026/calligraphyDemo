@@ -8,6 +8,7 @@
 
 #import "SVGDrawingView.h"
 #import "Stroke.h"
+#import "OutsideStrokingView.h"
 
 @interface SVGDrawingView ()
 {
@@ -16,13 +17,18 @@
     CGColorRef lastTappedLayerOriginalBorderColor;
     
     UIBezierPath *movingPath;
+    UIBezierPath *outSidePath;
     UIImage *incrementalImage;
     
     NSUInteger strokeCount;
     NSUInteger currStep;
+    
+    CGPoint lastPoint;
 }
 
 @property (nonatomic, strong) NSMutableArray *strokeArray;
+
+@property (nonatomic, strong) OutsideStrokingView *outsideStrokingView;
 
 @end
 
@@ -45,6 +51,7 @@
     if (self = [super initWithSVGKImage:svgImage]) {
         self.showBorder = FALSE;
         movingPath = [UIBezierPath bezierPath];
+        outSidePath = [UIBezierPath bezierPath];
         currStep = 0;
         
         UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
@@ -54,12 +61,22 @@
         
         [self setupDrawingLayer];
         
+        _outsideStrokingView = [[OutsideStrokingView alloc] initWithFrame:self.bounds];
+        [self addSubview:_outsideStrokingView];
+        
+        
         // 2s之后开始播放第一笔划的指引动画
         [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
     }
     return self;
 }
 
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    _outsideStrokingView.frame = self.bounds;
+}
 
 
 // Only override drawRect: if you perform custom drawing.
@@ -278,12 +295,12 @@
     
     SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
     NSInteger count = self.strokeArray.count;
-    
+    NSInteger border = 0;
     if (lastTappedLayer) {
         //如果有选中的笔划并且触摸点在笔划区域内，则视该笔划为当前笔划。否则重新获取触摸点所在笔划。
         CGPoint p1 = [lastTappedLayer convertPoint:p fromLayer:self.layer];
         
-        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(lastTappedLayer.path, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(lastTappedLayer.path, nil, border, kCGLineCapRound, kCGLineJoinRound, 4);
         BOOL containsStroking = CGPathContainsPoint(strokingPath, NULL, p1, false);
         BOOL containsPath = CGPathContainsPoint(lastTappedLayer.path, NULL, p1, false);
         
@@ -293,7 +310,7 @@
                 
                 Stroke *stroke = [self.strokeArray objectAtIndex:i];
                 
-                CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+                CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, border, kCGLineCapRound, kCGLineJoinRound, 4);
                 
                 if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) || CGPathContainsPoint(strokingPath, NULL, p, false)) {
                     lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
@@ -307,7 +324,7 @@
         // 重新获取触摸点所在笔划。
         for (NSInteger i = count - 1; i >= 0; i--) {
             Stroke *stroke = [self.strokeArray objectAtIndex:i];
-            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
+            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, border, kCGLineCapRound, kCGLineJoinRound, 4);
             // 处于笔划轮廓内或轮廓上均视为在该笔划区域内
             if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) || CGPathContainsPoint(strokingPath, NULL, p, false)) {
                 lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
@@ -319,6 +336,18 @@
     }
     
 
+    CGRect bounds = self.bounds;
+    
+    UIGraphicsBeginImageContextWithOptions(bounds.size, NO, 0.0);
+    
+    if (incrementalImage)
+    {
+        [incrementalImage drawAtPoint:CGPointZero];
+    }
+    
+    [[UIColor blackColor] setStroke];
+    [[UIColor blackColor] setFill];
+    
     
         if (lastTappedLayer) {
             // 暂时不判断是否超出了笔划形状的区域
@@ -333,6 +362,7 @@
             // 滑动前后两点
             CGPoint P1 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:prevPoint index:&startIndex];
             CGPoint P2 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:p index:&endIndex];
+            lastPoint = P2;
             
             NSInteger d = 10;
             if (startIndex <= endIndex) {
@@ -342,6 +372,8 @@
                 // 靠近两端的直接取起hkok或者终点
                 leftPath = [stroke.guidesPath_L pathWithStart:P2 end:P1 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P1 end:P2 forceStart:forceStart forceEnd:forceEnd];
+                
+                outSidePath.CGPath = [leftPath combineWithPath:rightPath].CGPath;
                 
                 if (CGPathIsEmpty(movingPath.CGPath)) {
                     movingPath  = [leftPath combineWithPath:rightPath];
@@ -358,6 +390,7 @@
                 leftPath = [stroke.guidesPath_L pathWithStart:P1 end:P2 forceStart:forceEnd forceEnd:forceStart];
                 rightPath = [stroke.guidesPath_R pathWithStart:P2 end:P1 forceStart:forceStart forceEnd:forceEnd];
                 
+                outSidePath.CGPath = [rightPath combineWithPath:leftPath].CGPath;
                 if (CGPathIsEmpty(movingPath.CGPath)) {
                     movingPath  = [rightPath combineWithPath:leftPath];
                 } else {
@@ -371,22 +404,8 @@
             [movingPath closePath];
             
             
-            CGRect bounds = self.bounds;
             
-            UIGraphicsBeginImageContextWithOptions(bounds.size, NO, 0.0);
-            
-            
-            if (incrementalImage)
-            {
-                [incrementalImage drawAtPoint:CGPointZero];
-            }
-            
-            
-            
-            [[UIColor blackColor] setStroke];
-            [[UIColor blackColor] setFill];
-            
-            [stroke.contourPath addClip];
+            //[stroke.contourPath addClip];
             
             
 //            [clipPath fill];
@@ -420,25 +439,64 @@
 //                [pointPath stroke];
 //            }
             
+//            CGAffineTransform t = CGAffineTransformMakeTranslation(0, 0);
+//            
+//            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, &t, 10, kCGLineCapRound, kCGLineJoinRound, 4);
+//
+//            UIBezierPath *newPath = [UIBezierPath bezierPathWithCGPath:strokingPath];
+//            [[UIColor blackColor] set];
+//            [newPath stroke]; // ................. (8)
+//            [newPath fill];
+            
+            
             [[UIColor blackColor] set];
             [movingPath stroke]; // ................. (8)
+            
             [movingPath fill];
             
-            incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            //[movingPath removeAllPoints];
-            [self setNeedsDisplay];
-            
+            //[self.outsideStrokingView touchesEnded:touches withEvent:event];
         } else {
             NSLog(@"outOfBoundingBox");
             [movingPath removeAllPoints];
+            
+            
+            [[UIColor blackColor] set];
+            
+            
+            CGPoint offset = CGPointMake(p.x - lastPoint.x, p.y - lastPoint.y);
+            if (offset.x  > 10) {
+                offset.x = 10;
+            }
+            if (offset.x  < -10) {
+                offset.x = -10;
+            }
+            if (offset.y  > 10) {
+                offset.y = 10;
+            }
+            if (offset.y  < -10) {
+                offset.y = -10;
+            }
+            
+            CGAffineTransform t = CGAffineTransformMakeTranslation(offset.x, offset.y );
+            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(outSidePath.CGPath, &t, border, kCGLineCapRound, kCGLineJoinRound, 4);
+            UIBezierPath *newPath = [UIBezierPath bezierPathWithCGPath:strokingPath];
+            [newPath setLineWidth:10];
+            [newPath stroke]; // ................. (8)
+            [newPath fill];
+            //[self.outsideStrokingView touchesMoved:touches withEvent:event];
         }
+    
+    incrementalImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    //[movingPath removeAllPoints];
+    [self setNeedsDisplay];
  }
 
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     [movingPath removeAllPoints];
+    [outSidePath removeAllPoints];
     
     Stroke *stroke = [self.strokeArray objectAtIndex:currStep];
     stroke.fillColor = nil;
@@ -452,6 +510,7 @@
     });
     
     lastTappedLayer = nil;
+    [self.outsideStrokingView touchesEnded:touches withEvent:event];
 }
 
 
