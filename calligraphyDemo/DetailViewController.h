@@ -18,7 +18,7 @@
 
 @property (strong, nonatomic) id detailItem;
 
-@property (nonatomic, strong) SVGKImageView *contentView;
+@property (nonatomic, strong) SVGDrawingView *contentView;
 
 @end
 

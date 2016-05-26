@@ -70,14 +70,17 @@
 
 - (void)handleRightBarButton:(UIButton *)button
 {
-    AdonitViewController *vc = [[AdonitViewController alloc] initWithNibName:@"AdonitViewController" bundle:nil];
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-    vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self presentViewController:nav animated:YES completion:^{
-        
-    }];
+//    AdonitViewController *vc = [[AdonitViewController alloc] initWithNibName:@"AdonitViewController" bundle:nil];
+//    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+//    vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+//    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//    [self presentViewController:nav animated:YES completion:^{
+//        
+//    }];
     //[self.navigationController pushViewController:vc animated:YES];
+    
+
+    [_contentView preview];    
 }
 
 - (void)dealloc

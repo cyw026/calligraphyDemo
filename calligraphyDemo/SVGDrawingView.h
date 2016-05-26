@@ -11,11 +11,7 @@
 #import <QuartzCore/CALayer.h>
 #import "UIBezierPath-Points.h"
 
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
-#import <AdonitSDK/AdonitSDK.h>
-#import "Brush.h"
+#import "PaintingView.h"
 
 #define kDrawingPathKey @"drawingPath"
 #define kSubdivideFlagKey @"subdivideFlag"
@@ -33,5 +29,5 @@ typedef enum : NSUInteger {
 @property (nonatomic, retain) CALayer *penLayer;
 
 - (id)initWithSVGName:(NSString *)svgName;
-
+- (void)preview;
 @end

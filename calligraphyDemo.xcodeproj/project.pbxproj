@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		12097D091CF733A700EF93EC /* Particle.png in Resources */ = {isa = PBXBuildFile; fileRef = 12097D081CF733A700EF93EC /* Particle.png */; };
 		121DDC911CCD504700C40724 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 121DDC901CCD504700C40724 /* libxml2.2.tbd */; };
 		122AABDB1CCCA28800677FF1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 122AABDA1CCCA28800677FF1 /* main.m */; };
 		122AABDE1CCCA28800677FF1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 122AABDD1CCCA28800677FF1 /* AppDelegate.m */; };
@@ -169,6 +170,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		12097D081CF733A700EF93EC /* Particle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Particle.png; sourceTree = "<group>"; };
 		121DDC901CCD504700C40724 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		122AABD61CCCA28800677FF1 /* calligraphyDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = calligraphyDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		122AABDA1CCCA28800677FF1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -476,6 +478,7 @@
 			isa = PBXGroup;
 			children = (
 				126DC1B71CDBBBC200BFD1E2 /* brush5.png */,
+				12097D081CF733A700EF93EC /* Particle.png */,
 				126DC1B51CDBA43D00BFD1E2 /* brush_baby2.png */,
 				126DC1B01CDB935700BFD1E2 /* brush4.png */,
 				72A396751CDB2D1200D40D37 /* brush3.png */,
@@ -746,6 +749,7 @@
 				7297A58B1CD99D13003682A1 /* Icon-Small.png in Resources */,
 				7297A5891CD99D13003682A1 /* Icon-72.png in Resources */,
 				7297A5A41CD9A118003682A1 /* brush.png in Resources */,
+				12097D091CF733A700EF93EC /* Particle.png in Resources */,
 				122AABEC1CCCA28800677FF1 /* LaunchScreen.storyboard in Resources */,
 				7297A5A21CD9A054003682A1 /* PaintingViewController.xib in Resources */,
 				72C6E7CE1CE42BCF001281E9 /* brush.png in Resources */,

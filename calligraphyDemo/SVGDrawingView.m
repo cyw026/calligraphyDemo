@@ -10,17 +10,6 @@
 #import "Stroke.h"
 #import "OutsideStrokingView.h"
 
-#import <AdonitSDK/AdonitSDK.h>
-#import <QuartzCore/QuartzCore.h>
-#import <OpenGLES/EAGLDrawable.h>
-#import "SmoothStroke.h"
-#import "CanvasView.h"
-#import "AbstractBezierPathElement.h"
-#import "LineToPathElement.h"
-#import "CurveToPathElement.h"
-#import "UIColor+Components.h"
-#import "UIEvent+iOS8.h"
-
 @interface SVGDrawingView ()
 {
     CAShapeLayer* lastTappedLayer;
@@ -35,12 +24,12 @@
     NSUInteger currStep;
     
     CGPoint lastPoint;
-    SmoothStroke* blurStroke; //超出填充区域的笔划
+    NSTimer *timer;
 }
 
 @property (nonatomic, strong) NSMutableArray *strokeArray;
 
-@property (nonatomic, strong) OutsideStrokingView *outsideStrokingView;
+@property (nonatomic, strong) PaintingView *outsideStrokingView;
 
 @end
 
@@ -64,7 +53,6 @@
         self.showBorder = FALSE;
         movingPath = [UIBezierPath bezierPath];
         outSidePath = [UIBezierPath bezierPath];
-        blurStroke = [[SmoothStroke alloc] init];
         currStep = 0;
         
         UIImage *image = [UIImage imageNamed:@"paintingView_BG"];
@@ -72,14 +60,20 @@
         
         [self parseStrokeInfomation];
         
-        [self setupDrawingLayer];
         
-        _outsideStrokingView = [[OutsideStrokingView alloc] initWithFrame:self.bounds];
+        
+        _outsideStrokingView = [[PaintingView alloc] initWithFrame:self.bounds];
+        _outsideStrokingView.backgroundColor = [UIColor clearColor];
+        // Defer to the OpenGL view to set the brush color
+        [_outsideStrokingView setBrushColorWithRed:0.0 green:0.0 blue:0];
+        _outsideStrokingView.userInteractionEnabled = NO;
+        
         [self addSubview:_outsideStrokingView];
         
+        [self setupDrawingLayer];
         
         // 2s之后开始播放第一笔划的指引动画
-        [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
+        timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
     }
     return self;
 }
@@ -225,6 +219,9 @@
 {
     [self.penLayer removeAllAnimations];
     self.penLayer.hidden = YES;
+    if ([timer isValid]) {
+        [timer invalidate];
+    }
 }
 
 - (void) animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
@@ -257,47 +254,7 @@
     // 停止手势动画
     [self stopAnimation];
     
-        SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
-        CAShapeLayer* hitLayer = (CAShapeLayer*)[layerForHitTesting hitTest:p];
-    
-    NSInteger count = self.strokeArray.count;
-    
-    for (NSInteger i = count - 1; i >= 0; i--) {
-        
-        Stroke *stroke = [self.strokeArray objectAtIndex:i];
-        
-        CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, nil, 20, kCGLineCapRound, kCGLineJoinRound, 4);
-        
-        if (CGPathContainsPoint(stroke.contourPath.CGPath, NULL, p, false) ) {
-            lastTappedLayer = (CAShapeLayer*)[layerForHitTesting.SVGImage layerWithIdentifier:stroke.identifier];
-            break;
-        } else {
-            lastTappedLayer = nil;
-        }
-    }
-    
-//        if ( [hitLayer isKindOfClass:[CAShapeLayerWithHitTest class]]) {
-//            // 判断当前选中的是否为笔画的形状图层
-//            //hitLayer.strokeColor = [UIColor blackColor].CGColor;
-//            //hitLayer.lineWidth = 0;
-//            
-//            if( hitLayer == lastTappedLayer )
-//                [self deselectTappedLayer];
-//            else {
-//                [self deselectTappedLayer];
-//            }
-//            lastTappedLayer = [self getPathLayerByIndex:PATHLAYER_INDEX_CONTOUR superlayer:hitLayer.superlayer];
-//            
-//        }
-        //        else {
-        //            if (lastTappedLayer != nil) {
-        //                lastTappedLayerOriginalBorderColor = lastTappedLayer.borderColor;
-        //                lastTappedLayerOriginalBorderWidth = lastTappedLayer.borderWidth;
-        //
-        //                lastTappedLayer.borderColor = [UIColor greenColor].CGColor;
-        //                lastTappedLayer.borderWidth = 3.0;
-        //            }
-        //        }
+    lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:3];
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -306,8 +263,6 @@
     CGPoint p = [touch locationInView:self];
     CGPoint prevPoint = [touch previousLocationInView:self];
     
-    SVGKLayer* layerForHitTesting = (SVGKLayer*)self.layer;
-    NSInteger count = self.strokeArray.count;
     NSInteger border = 0;
     if (lastTappedLayer) {
         //如果有选中的笔划并且触摸点在笔划区域内，则视该笔划为当前笔划。否则重新获取触摸点所在笔划。
@@ -318,10 +273,10 @@
         BOOL containsPath = CGPathContainsPoint(lastTappedLayer.path, NULL, p1, false);
         
         if (!containsPath && !containsStroking) {
-            lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:1];
+            lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:3];
         }
     } else {
-        lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:1];
+        lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:3];
     }
     
 
@@ -336,6 +291,7 @@
     
     [[UIColor blackColor] setStroke];
     [[UIColor blackColor] setFill];
+    [[UIColor blackColor] set];
     
     // 停止手势动画，把当前笔划标记为已播放
     [self stopAnimation];
@@ -428,34 +384,19 @@
 //                [pointPath stroke];
 //            }
             
-//            CGAffineTransform t = CGAffineTransformMakeTranslation(0, 0);
-//            
-//            CGPathRef strokingPath = CGPathCreateCopyByStrokingPath(stroke.contourPath.CGPath, &t, 10, kCGLineCapRound, kCGLineJoinRound, 4);
-//
-//            UIBezierPath *newPath = [UIBezierPath bezierPathWithCGPath:strokingPath];
-//            [[UIColor blackColor] set];
-//            [newPath stroke]; // ................. (8)
-//            [newPath fill];
-            
-            
-            [[UIColor blackColor] set];
-            [movingPath stroke]; // ................. (8)
-            
+            [movingPath stroke];
             [movingPath fill];
             
             //[self.outsideStrokingView touchesEnded:touches withEvent:event];
+            //[self.outsideStrokingView touchesBegan:touches withEvent:event];
+
         } else {
             //NSLog(@"outOfBoundingBox");
             [movingPath removeAllPoints];
             
-            
-            [[UIColor blackColor] set];
-            
-            
             lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:20];
             if (lastTappedLayer) {
-                
-                
+                // 边缘过渡笔划
                 Stroke *stroke = [self strokeByIdentifier:[lastTappedLayer valueForKey:kSVGElementIdentifier]];
                 stroke.animPlayFlag = 1;
                 
@@ -466,7 +407,7 @@
                 CGPoint P2 = [UIBezierPath pointAdjacent:stroke.guidesPath_M.CGPath withPoint:p index:&endIndex];
                 lastPoint = P2;
                 
-                NSInteger d = 10;
+                NSInteger d = 5;
                 if (startIndex <= endIndex) {
                     // 升序
                     BOOL forceStart = startIndex < d ? YES:NO;
@@ -489,9 +430,7 @@
                 }
                 
                 
-                
                 [outSidePath closePath];
-                
                 
                 CGPoint offset = CGPointMake(p.x - P2.x, p.y - P2.y);
                 CGAffineTransform t = CGAffineTransformMakeTranslation(offset.x/2, offset.y/2 );
@@ -499,7 +438,7 @@
                 UIBezierPath *newPath = [UIBezierPath bezierPathWithCGPath:strokingPath];
                 //newPath.lineCapStyle = kCGLineCapRound;
                 //newPath.lineJoinStyle = kCGLineJoinRound;
-                [newPath setLineWidth:10];
+                [newPath setLineWidth:5];
                 [newPath stroke]; // ................. (8)
                 [newPath fill];
             }
@@ -574,19 +513,12 @@
 {
     [movingPath removeAllPoints];
     [outSidePath removeAllPoints];
-    [blurStroke.segments removeAllObjects];
-    [blurStroke.segmentSmoother reset];
     
     Stroke *stroke = [self.strokeArray objectAtIndex:currStep];
     stroke.fillColor = nil;
     [self setNeedsDisplay];
     // 倒计时2s之后重新开始动画
-    double delayInSeconds = 2.0;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        //执行事件
-        [self palyAnimation];
-    });
+    timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
     
     lastTappedLayer = nil;
     [self.outsideStrokingView touchesEnded:touches withEvent:event];
@@ -689,6 +621,23 @@
     double deltaTime = [[NSDate date] timeIntervalSinceDate:tmpStartData];
     NSLog(@">>>>>>>>>>cost time = %f ms", deltaTime*1000);
     
+}
+
+- (void)preview
+{
+    UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, 0);
+
+//    UIGraphicsBeginImageContext(CGSizeMake(self.frame.size.width, self.frame.size.height));
+    CGContextRef contextRef = UIGraphicsGetCurrentContext();
+    [self.layer renderInContext:contextRef];
+    
+    UIImage *glImage = [self.outsideStrokingView snapshot];
+    [glImage drawAtPoint:CGPointMake(0,0)];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    UIImageWriteToSavedPhotosAlbum(image, self, nil, nil);
 }
 
 @end

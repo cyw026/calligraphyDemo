@@ -376,7 +376,7 @@ static float clamp(min, max, value) { return fmaxf(min, fminf(max, value)); }
     CGFloat duration = [[NSDate date] timeIntervalSinceDate:lastDate];
 
     CGFloat velocityMagnitude = distanceFromPrevious/duration;
-    NSLog(@"velocityMagnitude%f", velocityMagnitude);
+    
 
     float clampedVelocityMagnitude = clamp(VELOCITY_CLAMP_MIN, VELOCITY_CLAMP_MAX, velocityMagnitude);
 

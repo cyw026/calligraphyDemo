@@ -56,9 +56,11 @@
 #import "fileUtil.h"
 #import "debug.h"
 
-#import "UIBezierPath-Points.h"
-
 //CONSTANTS:
+
+#define kBrushOpacity		(1.0 / 3.0)
+#define kBrushPixelStep		1
+#define kBrushScale			1
 
 
 // Shaders
@@ -92,10 +94,10 @@ programInfo_t program[NUM_PROGRAMS] = {
 
 
 // Texture
-//typedef struct {
-//    GLuint id;
-//    GLsizei width, height;
-//} textureInfo_t;
+typedef struct {
+    GLuint id;
+    GLsizei width, height;
+} textureInfo_t;
 
 
 @interface PaintingView()
@@ -112,11 +114,10 @@ programInfo_t program[NUM_PROGRAMS] = {
     // OpenGL name for the depth buffer that is attached to viewFramebuffer, if it exists (0 if it does not exist)
     GLuint depthRenderbuffer;
 	
-	//textureInfo_t brushTexture;     // brush texture
+	textureInfo_t brushTexture;     // brush texture
     GLfloat brushColor[4];          // brush color
     
-    
-	
+	Boolean	firstTouch;
 	Boolean needsErase;
     
     // Shader objects
@@ -128,18 +129,7 @@ programInfo_t program[NUM_PROGRAMS] = {
     GLuint vboId;
     
     BOOL initialized;
-    
-    /**
-     *  UIBezierPath
-     */
-    UIBezierPath *path;
-    UIImage *incrementalImage;
-    CGPoint pts[5]; // we now need to keep track of the four points of a Bezier segment and the first control point of the next segment
-    uint ctr;
-    
 }
-
-
 
 @end
 
@@ -147,7 +137,6 @@ programInfo_t program[NUM_PROGRAMS] = {
 
 @synthesize  location;
 @synthesize  previousLocation;
-@synthesize  myBrush;
 
 // Implement this to override the default layer class (which is [CALayer class]).
 // We do this so that our view will be backed by a layer that is capable of OpenGL ES rendering.
@@ -178,22 +167,35 @@ programInfo_t program[NUM_PROGRAMS] = {
         
 		// Make sure to start with a cleared buffer
 		needsErase = YES;
-        
-        self.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"paintingView_BG"]];
-        
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(erase)];
-        tap.numberOfTapsRequired = 3; // Tap twice to clear drawing!
-        [self addGestureRecognizer:tap];
-        
-        /**
-         *  UIBezierPath
-         */
-        [self setMultipleTouchEnabled:NO];
-        path = [UIBezierPath bezierPath];
-        [path setLineWidth:2.0];
 	}
 	
 	return self;
+}
+
+- (id)initWithFrame:(CGRect)frame {
+    
+    if ((self = [super initWithFrame:frame])) {
+        CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
+        
+        eaglLayer.opaque = YES;
+        // In this application, we want to retain the EAGLDrawable contents after a call to presentRenderbuffer.
+        eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        [NSNumber numberWithBool:YES], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+        
+        context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        
+        if (!context || ![EAGLContext setCurrentContext:context]) {
+            return nil;
+        }
+        
+        // Set the view's scale factor as you wish
+        self.contentScaleFactor = [[UIScreen mainScreen] scale];
+        
+        // Make sure to start with a cleared buffer
+        needsErase = YES;
+    }
+    
+    return self;
 }
 
 // If our view is resized, we'll be asked to layout subviews.
@@ -266,7 +268,7 @@ programInfo_t program[NUM_PROGRAMS] = {
             glUniformMatrix4fv(program[PROGRAM_POINT].uniform[UNIFORM_MVP], 1, GL_FALSE, MVPMatrix.m);
         
             // point size
-            glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], myBrush.texture.width / kBrushScale);
+            glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], brushTexture.width / kBrushScale);
             
             // initialize brush color
             glUniform4fv(program[PROGRAM_POINT].uniform[UNIFORM_VERTEX_COLOR], 1, brushColor);
@@ -274,6 +276,52 @@ programInfo_t program[NUM_PROGRAMS] = {
 	}
     
     glError();
+}
+
+// Create a texture from an image
+- (textureInfo_t)textureFromName:(NSString *)name
+{
+    CGImageRef		brushImage;
+	CGContextRef	brushContext;
+	GLubyte			*brushData;
+	size_t			width, height;
+    GLuint          texId;
+    textureInfo_t   texture;
+    
+    // First create a UIImage object from the data in a image file, and then extract the Core Graphics image
+    brushImage = [UIImage imageNamed:name].CGImage;
+    
+    // Get the width and height of the image
+    width = CGImageGetWidth(brushImage);
+    height = CGImageGetHeight(brushImage);
+    
+    // Make sure the image exists
+    if(brushImage) {
+        // Allocate  memory needed for the bitmap context
+        brushData = (GLubyte *) calloc(width * height * 4, sizeof(GLubyte));
+        // Use  the bitmatp creation function provided by the Core Graphics framework.
+        brushContext = CGBitmapContextCreate(brushData, width, height, 8, width * 4, CGImageGetColorSpace(brushImage), kCGImageAlphaPremultipliedLast);
+        // After you create the context, you can draw the  image to the context.
+        CGContextDrawImage(brushContext, CGRectMake(0.0, 0.0, (CGFloat)width, (CGFloat)height), brushImage);
+        // You don't need the context at this point, so you need to release it to avoid memory leaks.
+        CGContextRelease(brushContext);
+        // Use OpenGL ES to generate a name for the texture.
+        glGenTextures(1, &texId);
+        // Bind the texture name.
+        glBindTexture(GL_TEXTURE_2D, texId);
+        // Set the texture parameters to use a minifying filter and a linear filer (weighted average)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // Specify a 2D texture image, providing the a pointer to the image data in memory
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)width, (int)height, 0, GL_RGBA, GL_UNSIGNED_BYTE, brushData);
+        // Release  the image data; it's no longer needed
+        free(brushData);
+        
+        texture.id = texId;
+        texture.width = (int)width;
+        texture.height = (int)height;
+    }
+    
+    return texture;
 }
 
 - (BOOL)initGL
@@ -311,22 +359,19 @@ programInfo_t program[NUM_PROGRAMS] = {
     glGenBuffers(1, &vboId);
     
     // Load the brush texture
-    myBrush = [CBrush createBrushWithTexture:@"brush.png"];
+    brushTexture = [self textureFromName:@"Particle.png"];
     
     // Load shaders
     [self setupShaders];
     
     // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
-    glEnable( GL_BLEND );   // 启用混合
-    //glDisable( GL_BLEND );  // 禁用关闭混合
+    glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     
-    // Playback recorded path, which is "Shake Me"
+//    // Playback recorded path, which is "Shake Me"
 //    NSMutableArray* recordedPaths = [NSMutableArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Recording" ofType:@"data"]];
 //    if([recordedPaths count])
 //        [self performSelector:@selector(playback:) withObject:recordedPaths afterDelay:0.2];
-    
-    self.currentWidth = myBrush.texture.width / kBrushScale;
     
     return YES;
 }
@@ -382,10 +427,10 @@ programInfo_t program[NUM_PROGRAMS] = {
 		depthRenderbuffer = 0;
 	}
     // texture
-//    if (brushTexture.id) {
-//		glDeleteTextures(1, &brushTexture.id);
-//		brushTexture.id = 0;
-//	}
+    if (brushTexture.id) {
+		glDeleteTextures(1, &brushTexture.id);
+		brushTexture.id = 0;
+	}
     // vbo
     if (vboId) {
         glDeleteBuffers(1, &vboId);
@@ -433,29 +478,20 @@ programInfo_t program[NUM_PROGRAMS] = {
 	
 	// Allocate vertex array buffer
 	if(vertexBuffer == NULL)
-		vertexBuffer = malloc(2 * sizeof(GLfloat));
+		vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
 	
 	// Add points to the buffer so there are drawing points every X pixels
-//	count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
-//	for(i = 0; i < count; ++i) {
-//		if(vertexCount == vertexMax) {
-//			vertexMax = 2 * vertexMax;
-//			vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
-//		}
-//		
-//		vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
-//		vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
-//		vertexCount += 1;
-//	}
-    
-    vertexBuffer[0] = start.x;
-    vertexBuffer[1] = start.y;
-    vertexCount += 1;
-    
-    // point size
-//    CGFloat pointSize = myBrush.texture.width / kBrushScale;
-//    CGFloat width = pointSize - count*300/300;
-    //glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], self.currentWidth);
+	count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+	for(i = 0; i < count; ++i) {
+		if(vertexCount == vertexMax) {
+			vertexMax = 2 * vertexMax;
+			vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
+		}
+		
+		vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
+		vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
+		vertexCount += 1;
+	}
     
 	// Load data to the Vertex Buffer Object
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
@@ -463,102 +499,21 @@ programInfo_t program[NUM_PROGRAMS] = {
 	
     glEnableVertexAttribArray(ATTRIB_VERTEX);
     glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    //glPointSize(arc4random()%kBrushScale); //random brush/point size
+    
+    CGFloat width = brushTexture.width / kBrushScale;
+    glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], width - 0.1*count);
 	
 	// Draw
-//    CGFloat width = 0.0;
-//    glUseProgram(program[PROGRAM_POINT].id);
-//    for (int i = 0; i < vertexCount; i++) {
-//        width = self.currentWidth - 30.0/count * i;
-//        if (width > 64) {
-//            width = 64;
-//        }
-//        if (width < 1) {
-//            width = 1;
-//        }
-//        glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], width);
-//        glDrawArrays(GL_POINTS, i, (int)1);
-//    }
-//    
-//    self.currentWidth = width;
-	
-    glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], self.currentWidth);
-    // Draw
     glUseProgram(program[PROGRAM_POINT].id);
-    glDrawArrays(GL_POINTS, 0, (int)vertexCount);
-    
-//	// Display the buffer
-//	glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-//	[context presentRenderbuffer:GL_RENDERBUFFER];
+	glDrawArrays(GL_POINTS, 0, (int)vertexCount);
+	
+	// Display the buffer
+	glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+	[context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
-- (void)renderLineFromPoint2:(CGPoint)start toPoint:(CGPoint)end
-{
-    static GLfloat*		vertexBuffer = NULL;
-    static NSUInteger	vertexMax = 64;
-    NSUInteger			vertexCount = 0,
-    count,
-    i;
-    
-    [EAGLContext setCurrentContext:context];
-    glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
-    
-    // Convert locations from Points to Pixels
-    CGFloat scale = self.contentScaleFactor;
-    start.x *= scale;
-    start.y *= scale;
-    end.x *= scale;
-    end.y *= scale;
-    
-    // Allocate vertex array buffer
-    if(vertexBuffer == NULL)
-        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
-    
-    // Add points to the buffer so there are drawing points every X pixels
-    count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
-    for(i = 0; i < count; ++i) {
-        if(vertexCount == vertexMax) {
-            vertexMax = 2 * vertexMax;
-            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
-        }
-        
-        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
-        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
-        vertexCount += 1;
-    }
-    
-    // Load data to the Vertex Buffer Object
-    glBindBuffer(GL_ARRAY_BUFFER, vboId);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_STATIC_DRAW);
-    
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    // Draw
-        CGFloat width = 0.0;
-        glUseProgram(program[PROGRAM_POINT].id);
-        for (int i = 0; i < vertexCount; i++) {
-            width = self.currentWidth - 2.0/count * i;
-            if (width > 64) {
-                width = 64;
-            }
-            if (width < 10) {
-                width = 10;
-            }
-            glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], width);
-            glDrawArrays(GL_POINTS, i, (int)1);
-        }
-    
-        self.currentWidth = width;
-    
-    //glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], self.currentWidth);
-    // Draw
-    //glUseProgram(program[PROGRAM_POINT].id);
-    //glDrawArrays(GL_POINTS, 0, (int)vertexCount);
-    
-    // Display the buffer
-    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-    [context presentRenderbuffer:GL_RENDERBUFFER];
-}
 // Reads previously recorded points and draws them onscreen. This is the Shake Me message that appears when the application launches.
 - (void)playback:(NSMutableArray*)recordedPaths
 {
@@ -595,145 +550,48 @@ programInfo_t program[NUM_PROGRAMS] = {
 
 // Handles the start of a touch
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-
-    
+{   
 	CGRect				bounds = [self bounds];
-    UITouch*            touch = [[event touchesForView:self] anyObject];
-    ctr = 0;
-    pts[0] = [touch locationInView:self];
-    
-    
+    UITouch*            touch = touches.anyObject;
 	firstTouch = YES;
-    self.currentWidth = myBrush.texture.width / kBrushScale;
-    NSLog(@"self.currentWidth:%f", self.currentWidth);
-    
 	// Convert touch point from UIView referential to OpenGL one (upside-down flip)
 	location = [touch locationInView:self];
 	location.y = bounds.size.height - location.y;
-    
-    [self renderLineFromPoint:location toPoint:location];
-    
-    // Display the buffer
-    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-    [context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 // Handles the continuation of a touch.
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {   
 	CGRect				bounds = [self bounds];
-	UITouch*			touch = [touches anyObject];
-    CGPoint p = [touch locationInView:self];
-    ctr++;
-    pts[ctr] = p;
-    if (ctr == 4)
-    {
-        //NSLog(@"touchesMoved:");
-              
-        pts[3] = CGPointMake((pts[2].x + pts[4].x)/2.0, (pts[2].y + pts[4].y)/2.0); // move the endpoint to the middle of the line joining the second control point of the first Bezier segment and the first control point of the second Bezier segment
-        [path moveToPoint:pts[0]];
-        [path addCurveToPoint:pts[3] controlPoint1:pts[1] controlPoint2:pts[2]]; // add a cubic Bezier from pt[0] to pt[3], with control points pt[1] and pt[2]
-        
-        // 估算贝塞尔曲线长度
-        int x1 = fabs(pts[0].x - pts[3].x);
-        int x2 = fabs(pts[0].y - pts[3].y);
-        int len = (int)(sqrt(pow(x1, 2) + pow(x2, 2)));
-        
-        float dx1 = pts[1].x - pts[0].x;
-        float dy1 = pts[1].y - pts[0].y;
-        
-        float dx2 = pts[3].x - pts[2].x;
-        float dy2 = pts[3].y - pts[2].y;
-        
-        float speed1 = sqrtf(dx1 * dx1 + dy1 * dy1);
-        float speed2 = sqrtf(dx2 * dx2 + dy2 * dy2);
-        float at = speed2 - speed1;
-        float at2 = -5*at/len;
-        
-        
-        NSArray * curvePoints = [UIBezierPath curveFactorizationWithFromPoint:pts[0] toPoint:pts[3] controlPoints:@[[NSValue valueWithCGPoint:pts[1]], [NSValue valueWithCGPoint:pts[2]]] count:len];
-
-        // 画每条线段
-        CGPoint lastPoint = pts[0];
-
-        for (int i = 0; i< len ; i++) {
-
-            // 省略多余点
-            CGFloat delta = sqrt(pow([curvePoints[i] CGPointValue].x - lastPoint.x, 2)+ pow([curvePoints[i] CGPointValue].y - lastPoint.y, 2));
-
-            if (delta < 1) {
-                continue;
-            }
-
-            CGPoint next = CGPointMake([curvePoints[i] CGPointValue].x, [curvePoints[i]CGPointValue].y);
-            
-            CGPoint frome = lastPoint;
-            CGPoint to = next;
-            frome.y = bounds.size.height - frome.y;
-            to.y = bounds.size.height - to.y;
-            
-            float targetW = self.currentWidth + at2*i/len;
-            //NSLog(@"targetW:%f", targetW);
-            if (targetW > 64) {
-                targetW = 64;
-            }
-            if (targetW < 5) {
-                targetW = 5;
-            }
-            
-            self.currentWidth = targetW;
-            [self renderLineFromPoint:frome toPoint:to];
-            //NSLog(@"renderLineFromPoint:%@, to:%@", [NSValue valueWithCGPoint:frome], [NSValue valueWithCGPoint:to]);
-            
-            lastPoint = next;
-        }
-        // Display the buffer
-        glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-        [context presentRenderbuffer:GL_RENDERBUFFER];
-
-        //[self setNeedsDisplay];
-        // replace points and get ready to handle the next segment
-        pts[0] = pts[3];
-        pts[1] = pts[4];
-        ctr = 1;
-    }
-    
-//	// Convert touch point from UIView referential to OpenGL one (upside-down flip)
+	UITouch*			touch = touches.anyObject;
+		
+	// Convert touch point from UIView referential to OpenGL one (upside-down flip)
 //	if (firstTouch) {
 //		firstTouch = NO;
-//		previousLocation = location;
-//		//previousLocation.y = bounds.size.height - previousLocation.y;
-//	} else
-//    {
-//		location = [touch locationInView:self];
-//	    location.y = bounds.size.height - location.y;
 //		previousLocation = [touch previousLocationInView:self];
 //		previousLocation.y = bounds.size.height - previousLocation.y;
+//	} else {
+		location = [touch locationInView:self];
+	    location.y = bounds.size.height - location.y;
+		previousLocation = [touch previousLocationInView:self];
+		previousLocation.y = bounds.size.height - previousLocation.y;
 //	}
-//    
-//		
-//	// Render the stroke
-//    NSLog(@"touchesMoved:%f", self.currentWidth);
-//	[self renderLineFromPoint:previousLocation toPoint:location];
+		
+	// Render the stroke
+	[self renderLineFromPoint:previousLocation toPoint:location];
 }
 
 // Handles the end of a touch event when the touch is a tap.
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	CGRect				bounds = [self bounds];
-    UITouch*            touch = [[event touchesForView:self] anyObject];
-//	if (firstTouch) {
-//		firstTouch = NO;
-//		previousLocation = [touch previousLocationInView:self];
-//		previousLocation.y = bounds.size.height - previousLocation.y;
-//		[self renderLineFromPoint:previousLocation toPoint:location];
-//	}
-    
-    //[self drawBitmap];
-    //[self setNeedsDisplay];
-    [path removeAllPoints];
-    ctr = 0;
+    UITouch*            touch = touches.anyObject;
+	if (firstTouch) {
+		firstTouch = NO;
+		previousLocation = [touch previousLocationInView:self];
+		previousLocation.y = bounds.size.height - previousLocation.y;
+		[self renderLineFromPoint:previousLocation toPoint:location];
+	}
 }
 
 // Handles the end of a touch event.
@@ -746,15 +604,10 @@ programInfo_t program[NUM_PROGRAMS] = {
 - (void)setBrushColorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue
 {
 	// Update the brush color
-//    brushColor[0] = 0.2;
-//    brushColor[1] = 0.6;
-//    brushColor[2] = 0.76;
-//    brushColor[3] = 0.9;
-    
-    brushColor[0] = 0.0;
-    brushColor[1] = 0.0;
-    brushColor[2] = 0.0;
-    brushColor[3] = 0.9;
+    brushColor[0] = red * kBrushOpacity;
+    brushColor[1] = green * kBrushOpacity;
+    brushColor[2] = blue * kBrushOpacity;
+    brushColor[3] = kBrushOpacity;
     
     if (initialized) {
         glUseProgram(program[PROGRAM_POINT].id);
@@ -765,6 +618,132 @@ programInfo_t program[NUM_PROGRAMS] = {
 
 - (BOOL)canBecomeFirstResponder {
     return YES;
+}
+
+- (UIImage*)snapshot
+{
+    // Bind the color renderbuffer used to render the OpenGL ES view
+    
+    // If your application only creates a single color renderbuffer which is already bound at this point,
+    
+    // this call is redundant, but it is needed if you're dealing with multiple renderbuffers.
+    
+    // Note, replace "_colorRenderbuffer" with the actual name of the renderbuffer object defined in your class.
+    
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewFramebuffer);
+    
+    
+    
+    // Get the size of the backing CAEAGLLayer
+    
+//    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+//    
+//    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+//    
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
+    
+    NSInteger x = 0, y = 0, width = backingWidth, height = backingHeight;
+    
+    NSInteger dataLength = width * height * 4;
+    
+    GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
+    
+    
+    
+    // Read pixel data from the framebuffer
+    
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    
+    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    
+    
+    // Create a CGImage with the pixel data
+    
+    // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
+    
+    // otherwise, use kCGImageAlphaPremultipliedLast
+    
+    CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, data, dataLength, NULL);
+    
+    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+    
+    CGImageRef iref = CGImageCreate(width, height, 8, 32, width * 4, colorspace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                    
+                                    ref, NULL, true, kCGRenderingIntentDefault);
+    
+    
+    
+    // OpenGL ES measures data in PIXELS
+    
+    // Create a graphics context with the target size measured in POINTS
+    
+    NSInteger widthInPoints, heightInPoints;
+    
+    if (NULL != UIGraphicsBeginImageContextWithOptions) {
+        
+        // On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
+        
+        // Set the scale parameter to your OpenGL ES view's contentScaleFactor
+        
+        // so that you get a high-resolution snapshot when its value is greater than 1.0
+        
+        CGFloat scale = self.contentScaleFactor;
+        
+        widthInPoints = width / scale;
+        
+        heightInPoints = height / scale;
+        
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(widthInPoints, heightInPoints), NO, scale);
+        
+    }
+    
+    else {
+        
+        // On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
+        
+        widthInPoints = width;
+        
+        heightInPoints = height;
+        
+        UIGraphicsBeginImageContext(CGSizeMake(widthInPoints, heightInPoints));
+        
+    }
+    
+    
+    CGContextRef cgcontext = UIGraphicsGetCurrentContext();
+    
+    
+    // UIKit coordinate system is upside down to GL/Quartz coordinate system
+    
+    // Flip the CGImage by rendering it to the flipped bitmap context
+    
+    // The size of the destination area is measured in POINTS
+    
+    CGContextSetBlendMode(cgcontext, kCGBlendModeCopy);
+    
+    CGContextDrawImage(cgcontext, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
+    
+    
+    // Retrieve the UIImage from the current context
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    
+    
+    UIGraphicsEndImageContext();
+    
+    
+    // Clean up
+    
+    free(data);
+    
+    CFRelease(ref);
+    
+    CFRelease(colorspace);
+    
+    CGImageRelease(iref);
+    
+    return image;
 }
 
 @end

@@ -11,7 +11,7 @@
 #import <AdonitSDK/JotStylusManager.h>
 
 #define           VELOCITY_CLAMP_MIN 20
-#define           VELOCITY_CLAMP_MAX 2000
+#define           VELOCITY_CLAMP_MAX 8000
 
 @interface Brush : NSObject
 {
