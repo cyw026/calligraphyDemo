@@ -10,6 +10,8 @@
 #import "Stroke.h"
 #import "OutsideStrokingView.h"
 
+#define DASHLINE_ENABLE 0
+
 @interface SVGDrawingView ()
 {
     CAShapeLayer* lastTappedLayer;
@@ -47,7 +49,7 @@
 {
     SVGKImage *svgImage = [SVGKImage imageNamed:svgName];
     //svgImage.scale = 0.5;
-    svgImage.size = CGSizeMake(375, 300);
+    svgImage.size = CGSizeMake(400, 350);
     
     if (self = [super initWithSVGKImage:svgImage]) {
         self.showBorder = FALSE;
@@ -105,6 +107,16 @@
         CGContextAddPath(ctx, path);
         CGContextFillPath(ctx);
         CGContextSaveGState(ctx);
+        
+        if ( stroke.bShowDashLine && DASHLINE_ENABLE) {
+            path = stroke.guidesPath_DL.CGPath;
+            CGContextSetStrokeColorWithColor(ctx, [UIColor colorWithRed:0.50 green:0.84 blue:1. alpha:1.].CGColor);
+            CGFloat lengths[] = {15,5,5,5};
+            CGContextSetLineDash(ctx, 0, lengths, 4);
+            CGContextAddPath(ctx, path);
+            CGContextStrokePath(ctx);
+            CGContextSaveGState(ctx);
+        }
     }
     
     [incrementalImage drawInRect:rect];
@@ -198,6 +210,7 @@
     if (stroke) {
         // 1、高亮显示当前笔划
         stroke.fillColor = [UIColor redColor];
+        stroke.bShowDashLine = YES;
         [self setNeedsDisplay];
         // 2、添加动画
         self.penLayer.hidden = NO;
@@ -263,7 +276,7 @@
     CGPoint p = [touch locationInView:self];
     CGPoint prevPoint = [touch previousLocationInView:self];
     
-    NSInteger border = 0;
+    NSInteger border = 10;
     if (lastTappedLayer) {
         //如果有选中的笔划并且触摸点在笔划区域内，则视该笔划为当前笔划。否则重新获取触摸点所在笔划。
         CGPoint p1 = [lastTappedLayer convertPoint:p fromLayer:self.layer];
@@ -273,10 +286,10 @@
         BOOL containsPath = CGPathContainsPoint(lastTappedLayer.path, NULL, p1, false);
         
         if (!containsPath && !containsStroking) {
-            lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:3];
+            lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:8];
         }
     } else {
-        lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:3];
+        lastTappedLayer = [self getTappedLayerWithPoint:p strokeWidth:8];
     }
     
 
@@ -516,6 +529,7 @@
     
     Stroke *stroke = [self.strokeArray objectAtIndex:currStep];
     stroke.fillColor = nil;
+    stroke.bShowDashLine = NO;
     [self setNeedsDisplay];
     // 倒计时2s之后重新开始动画
     timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(palyAnimation) userInfo:nil repeats:NO];
@@ -600,6 +614,8 @@
         stroke.guidesPath_R = [UIBezierPath bezierPathWithCGPath:layer_r.path];
         stroke.contourPath  = [UIBezierPath bezierPathWithCGPath:layer_c.path];
         
+        [self generateAuxiliaryLine:stroke layer:layer_c];
+        
         // 把原始左中右三条辅助线拆分重新赋值给对应图层
         stroke.guidesPath_L = [UIBezierPath pathWithPath:stroke.guidesPath_L];
         stroke.guidesPath_M = [UIBezierPath pathWithPath:stroke.guidesPath_M];
@@ -623,6 +639,40 @@
     
 }
 
+/**
+ *  生成对应笔划的辅助虚线
+ *
+ *  @param stroke 笔划
+ *  @param layer  笔划图层
+ */
+- (void)generateAuxiliaryLine:(Stroke *)stroke layer:(CAShapeLayer *)layer
+{
+    CGRect rect = [layer convertRect:layer.frame toLayer:self.layer];
+    
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(0, rect.origin.y)];
+    [path addLineToPoint:CGPointMake(self.frame.size.width, rect.origin.y)];
+    //[path closePath];
+    
+    [path moveToPoint:CGPointMake(0, rect.origin.y + rect.size.height)];
+    [path addLineToPoint:CGPointMake(self.frame.size.width, rect.origin.y + rect.size.height)];
+    //[path closePath];
+    
+    
+    [path moveToPoint:CGPointMake(rect.origin.x, 0)];
+    [path addLineToPoint:CGPointMake(rect.origin.x, self.frame.size.height)];
+    //[path closePath];
+    
+    [path moveToPoint:CGPointMake(rect.origin.x + rect.size.width, 0)];
+    [path addLineToPoint:CGPointMake(rect.origin.x + rect.size.width, self.frame.size.height)];
+    //[path closePath];
+    
+    stroke.guidesPath_DL = path;
+}
+/**
+ *  生成预览图片
+ */
 - (void)preview
 {
     UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, 0);

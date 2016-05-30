@@ -21,4 +21,6 @@
 @property (nonatomic, strong) UIBezierPath* guidesPath_M;
 @property (nonatomic, strong) UIBezierPath* guidesPath_R;
 
+@property (nonatomic, strong) UIBezierPath* guidesPath_DL;  //辅助虚线
+@property (nonatomic, assign) BOOL bShowDashLine;  //辅助虚线
 @end

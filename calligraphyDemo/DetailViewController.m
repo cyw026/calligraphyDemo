@@ -48,7 +48,7 @@
     //[self configureView];
     
     
-    self.contentView = [[SVGDrawingView alloc] initWithSVGName:@"test.svg"];
+    self.contentView = [[SVGDrawingView alloc] initWithSVGName:@"er.svg"];
     
     self.contentView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     
