@@ -979,6 +979,11 @@
 					"$(PROJECT_DIR)/3rd-party-frameworks/CocoaLumberjack-2.2.0/iOS",
 					"$(PROJECT_DIR)/calligraphyDemo/Adonit-iOS-SDK",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					CG_CONTEXT_SHOW_BACKTRACE,
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"Source/**",

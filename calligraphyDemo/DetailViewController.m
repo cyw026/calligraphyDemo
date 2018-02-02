@@ -47,8 +47,9 @@
     // Do any additional setup after loading the view, typically from a nib.
     //[self configureView];
     
+    [self.contentView removeFromSuperview];
     
-    self.contentView = [[SVGDrawingView alloc] initWithSVGName:@"er.svg"];
+    self.contentView = [[SVGDrawingView alloc] initWithSVGName:@"者.svg"];
     
     self.contentView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     

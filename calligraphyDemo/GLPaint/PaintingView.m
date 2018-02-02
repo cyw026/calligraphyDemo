@@ -193,6 +193,10 @@ typedef struct {
         
         // Make sure to start with a cleared buffer
         needsErase = YES;
+        
+        // Load the brush texture
+        //_brushTexture = [self textureFromName:@"Particle.png"];
+        [self setupBrushTexture:@"Particle.png"];
     }
     
     return self;
@@ -207,16 +211,17 @@ typedef struct {
     
     if (!initialized) {
         initialized = [self initGL];
+        // Clear the framebuffer the first time it is allocated
+        if (needsErase) {
+            [self erase];
+            needsErase = NO;
+        }
     }
     else {
         [self resizeFromLayer:(CAEAGLLayer*)self.layer];
     }
 	
-	// Clear the framebuffer the first time it is allocated
-	if (needsErase) {
-		[self erase];
-		needsErase = NO;
-	}
+
 }
 
 - (void)setupShaders
@@ -279,8 +284,14 @@ typedef struct {
 }
 
 // Create a texture from an image
-- (textureInfo_t)textureFromName:(NSString *)name
+- (void)setupBrushTexture:(NSString *)name
 {
+    // first, delete the old texture if needed
+    if (brushTexture.id) {
+        glDeleteTextures(1, &brushTexture.id);
+        brushTexture.id = 0;
+    }
+    
     CGImageRef		brushImage;
 	CGContextRef	brushContext;
 	GLubyte			*brushData;
@@ -316,12 +327,12 @@ typedef struct {
         // Release  the image data; it's no longer needed
         free(brushData);
         
-        texture.id = texId;
-        texture.width = (int)width;
-        texture.height = (int)height;
+        brushTexture.id = texId;
+        brushTexture.width = (int)width;
+        brushTexture.height = (int)height;
     }
     
-    return texture;
+    //return texture;
 }
 
 - (BOOL)initGL
@@ -359,7 +370,7 @@ typedef struct {
     glGenBuffers(1, &vboId);
     
     // Load the brush texture
-    brushTexture = [self textureFromName:@"Particle.png"];
+    //brushTexture = [self textureFromName:@"Particle.png"];
     
     // Load shaders
     [self setupShaders];
@@ -376,24 +387,83 @@ typedef struct {
     return YES;
 }
 
+/**
+ * this will create the framebuffer and related
+ * render and depth buffers that we'll use for
+ * drawing
+ */
+- (BOOL)createFramebuffer
+{
+    // Generate IDs for a framebuffer object and a color renderbuffer
+    glGenFramebuffers(1, &viewFramebuffer);
+    glGenRenderbuffers(1, &viewRenderbuffer);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+    // This call associates the storage for the current render buffer with the EAGLDrawable (our CAEAGLLayer)
+    // allowing us to draw into a buffer that will later be rendered to screen wherever the layer is (which corresponds with our view).
+    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(id<EAGLDrawable>)self.layer];
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, viewRenderbuffer);
+    
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
+    
+    // For this sample, we do not need a depth buffer. If you do, this is how you can create one and attach it to the framebuffer:
+    //    glGenRenderbuffers(1, &depthRenderbuffer);
+    //    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
+    //    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, backingWidth, backingHeight);
+    //    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
+    
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        NSLog(@"failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+        return NO;
+    }
+    
+    return YES;
+}
+
+/**
+ * Clean up any buffers we have allocated.
+ */
+- (void)destroyFramebuffer
+{
+    if(viewFramebuffer){
+        glDeleteFramebuffers(1, &viewFramebuffer);
+        viewFramebuffer = 0;
+    }
+    if(viewRenderbuffer){
+        glDeleteRenderbuffers(1, &viewRenderbuffer);
+        viewRenderbuffer = 0;
+    }
+    if(depthRenderbuffer){
+        glDeleteRenderbuffers(1, &depthRenderbuffer);
+        depthRenderbuffer = 0;
+    }
+}
+
 - (BOOL)resizeFromLayer:(CAEAGLLayer *)layer
 {
+    [self destroyFramebuffer];
+    
+    [self createFramebuffer];
+    
 	// Allocate color buffer backing based on the current layer size
-    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];
-	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
+//    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+//    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];
+//	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
+//    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
 	
     // For this sample, we do not need a depth buffer. If you do, this is how you can allocate depth buffer backing:
 //    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
 //    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, backingWidth, backingHeight);
 //    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
 	
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-        NSLog(@"Failed to make complete framebuffer objectz %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
-        return NO;
-    }
+//    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+//	{
+//        NSLog(@"Failed to make complete framebuffer objectz %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+//        return NO;
+//    }
     
     // Update projection matrix
     GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(0, backingWidth, 0, backingHeight, -1, 1);
@@ -412,6 +482,8 @@ typedef struct {
 // Releases resources when they are not longer needed.
 - (void)dealloc
 {
+    [EAGLContext setCurrentContext:context];
+    
     // Destroy framebuffers and renderbuffers
 	if (viewFramebuffer) {
         glDeleteFramebuffers(1, &viewFramebuffer);

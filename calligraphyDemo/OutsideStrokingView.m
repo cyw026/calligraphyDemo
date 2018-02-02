@@ -828,10 +828,10 @@ static float clamp(min, max, value) { return fmaxf(min, fminf(max, value)); }
 - (void)setupBrushTexture:(UIImage*)brushImage
 {
     // first, delete the old texture if needed
-    if (self.brushTexture) {
-        glDeleteTextures(1, &_brushTexture);
-        self.brushTexture = 0;
-    }
+//    if (self.brushTexture) {
+//        glDeleteTextures(1, &_brushTexture);
+//        self.brushTexture = 0;
+//    }
     
     // fetch the cgimage for us to draw into a texture
     CGImageRef brushCGImage = brushImage.CGImage;
